@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="22px" height="16px" viewBox="0 0 22 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 39 (31667) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy">
+            <g id="Group-2" transform="translate(1.000000, 0.000000)">
+                <circle id="Oval-144" fill="#F5F5F5" cx="12.8" cy="8" r="8"></circle>
+                <path d="M16.8,8 C16.8,8.29493333 16.7744,8.53333333 16.4794667,8.53333333 L14.1333333,8.53333333 L14.1333333,10.8794667 C14.1333333,11.1738667 13.8949333,11.2 13.6,11.2 C13.3050667,11.2 13.0666667,11.1738667 13.0666667,10.8794667 L13.0666667,8.53333333 L10.7205333,8.53333333 C10.4261333,8.53333333 10.4,8.29493333 10.4,8 C10.4,7.70506667 10.4261333,7.46666667 10.7205333,7.46666667 L13.0666667,7.46666667 L13.0666667,5.12053333 C13.0666667,4.8256 13.3050667,4.8 13.6,4.8 C13.8949333,4.8 14.1333333,4.8256 14.1333333,5.12053333 L14.1333333,7.46666667 L16.4794667,7.46666667 C16.7744,7.46666667 16.8,7.70506667 16.8,8 L16.8,8 Z" id="Shape" fill="#333D49"></path>
+                <circle id="Oval-144" stroke="#F5F5F5" stroke-width="2" fill="#333D49" cx="4.8" cy="8" r="4.8"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

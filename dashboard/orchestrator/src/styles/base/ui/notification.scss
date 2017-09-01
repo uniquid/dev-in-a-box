@@ -1,0 +1,59 @@
+.uniquid_notification {
+    font-family: 'Lato' !important;
+    font-size: 13px !important;
+    border-radius: 3px !important;
+    letter-spacing: 2px !important;
+    bottom: 1rem !important;
+    left: auto !important;
+    right: -100% !important;
+    &.notification-bar-active {
+      right: 1rem !important;
+    }
+    &.success {
+      background-color: $green !important;
+      &:before {
+        /* use !important to prevent issues with browser extensions that change fonts */
+        font-family: 'uniquid' !important;
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        font-size: 16px;
+
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        content: "\e116";
+      }
+      .notification-bar-wrapper {
+        float: right ;
+        margin-left: 10px ;
+      }
+    }
+
+    &.error {
+      background-color: $red !important;
+      &:before {
+        /* use !important to prevent issues with browser extensions that change fonts */
+        font-family: 'uniquid' !important;
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        font-size: 16px;
+
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        content: "\e117";
+      }
+      .notification-bar-wrapper {
+        float: right ;
+        margin-left: 10px ;
+      }
+    }
+}

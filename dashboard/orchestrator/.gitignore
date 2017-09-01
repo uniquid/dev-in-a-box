@@ -1,0 +1,6 @@
+node_modules
+build
+.sass-cache
+npm-debug.log
+.vscode
+coverage

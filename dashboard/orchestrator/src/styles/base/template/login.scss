@@ -1,0 +1,14 @@
+.login {
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 150px;
+  text-align: center;
+  h1 {
+    @include text-title-regular($p100)
+  }
+  .login_orchestrator {
+    width: 300px;
+    margin: 0 auto;
+    margin-top: 40px;
+  }
+}

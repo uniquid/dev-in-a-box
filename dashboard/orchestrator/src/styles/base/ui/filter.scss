@@ -1,0 +1,89 @@
+.filter-title {
+  @include text-mini-title($lighter);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 1px;
+    background-color: $primary;
+  }
+  &.mini {
+    @include text-general($lighter);
+    line-height: 30px;
+    &:after {
+      width: 100%;
+      background-color: $dark;
+    }
+  }
+}
+
+.filter-number {
+  @include text-mini($medium-light);
+  margin-left: 5px;
+}
+
+.filter {
+  .filter_single {
+    position: relative;
+    cursor: pointer;
+    &:hover {
+      &:before {
+        opacity: .5;
+        visibility: visible;
+      }
+    }
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: -7px;
+      right: 3px;
+      background-color: $dark;
+      border-radius: 5px;
+      opacity: 0;
+      visibility: hidden;
+      @include transition(.2s);
+    }
+    .single_name {
+      @include text-general($lighter);
+      height: 30px;
+      line-height: 30px;
+      z-index: 1;
+      position: relative;
+      @include truncate;
+      @include transition(.2s);
+    }
+
+    &.active {
+      &:before {
+        opacity: 1;
+        visibility: visible;
+      }
+      .single_name {
+        line-height: 30px;
+      }
+      .single_icon {
+        .icon_line {
+          background-color: $primary;
+          &:first-child {
+            @include rotate(180deg);
+          }
+          &:last-child {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+  &.result {
+    margin-bottom: 70px;
+  }
+}

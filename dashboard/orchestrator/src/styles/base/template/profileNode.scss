@@ -1,0 +1,83 @@
+.header_actions {
+	.actions_dropdown {
+		display: inline-block;
+		width: 35px;
+		height: 35px;
+		border-radius: 100%;
+		vertical-align: middle;
+		display: inline-block;
+		border: 1px solid #333C46;
+		background: #434E5A;
+		.icon-dots-three-horizontal {
+			line-height: 35px;
+    		text-align: center;
+			vertical-align: middle;
+			display: block;
+			color: $accent-500;
+		}
+	}
+	.actions_groupButton {
+		border: 1px solid #333C46;
+		//border-radius: 100%;
+		border-radius: 35px;
+    	height: 35px;
+		margin-right: 20px;
+		float: left;
+		@include clearfix;
+		background: #434E5A;
+		button {
+			float: left;
+			width: 120px;
+			background: none;
+			border-right: 1px solid #333C46;
+			border-left: 1px solid rgba(255,255,255, .1);
+			border-radius: 0;
+			margin: 0;
+			height: 34px;
+			&:last-of-type {
+				border-right: 0;
+			}
+			&:first-of-type {
+				border-left: 0;
+			}
+		}
+	}
+	.actions_delete {
+		float: right;
+		/* display: inline-block; */
+		width: 200px;
+		height: 35px;
+		margin: 0;
+		border: 1px solid #71230A;
+		background: #BE390E;
+	}
+	.actions_topup {
+		float: right;
+		/* display: inline-block; */
+		width: 200px;
+		height: 35px;
+		margin: 0;
+		border: 1px solid #155617;
+		background: $green;
+	}
+}
+
+.profile_header {
+	padding: 30px 30px 0 30px;
+	height: 135px;
+	@include clearfix;
+}
+
+.ReactTabs {
+	margin-top: -33px;
+	text-align: left;
+	.ReactTabs__TabList {
+		li {
+			@include text-mini-black($p100);
+			text-transform: uppercase;
+			margin-bottom: 0;
+			padding: 0;
+			padding-bottom: 10px;
+		}
+	} 
+}

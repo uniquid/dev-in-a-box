@@ -1,0 +1,165 @@
+#control {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: $zmax;
+  background-color: $transparent;
+  &.separation-line {
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 70px;
+      right: 20px;
+      height: 1px;
+      background-color: $dark;
+    }
+  }
+  .control_currentplay {
+    width: 220px;
+    height: 70px;
+    @include clearfix;
+    .currentplay_cover {
+      width: 70px;
+      height: 70px;
+      overflow: hidden;
+      float: left;
+      img {
+        width: 100%;
+      }
+    }
+    .currentplay_info {
+      width: 150px;
+      height: 70px;
+      float: left;
+      padding: 15px 0px 15px 20px;
+      position: relative;
+      overflow: hidden;
+      .info_artist {
+        @include text-general($lighter);
+        @include truncate;
+      }
+      .info_title {
+        @include text-general-black($lighter);
+        width: 300%;
+      }
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 40px;
+        background-image: $gradient-overlay-left-transparent;
+      }
+    }
+  }
+  .control_button {
+    position: absolute;
+    bottom: 0;
+    left: 220px;
+    width: 200px;
+    padding: 10px 35px;
+    @include clearfix;
+    .button_prevsong {
+      margin-top: 10px;
+      float: left;
+    }
+    .button_playsong {
+      float: left;
+      margin: 0 10px;
+    }
+    .button_nextsong {
+      margin-top: 10px;
+      float: left;
+    }
+  } 
+  .control_progress {
+    position: absolute;
+    bottom: 0;
+    left: 420px;
+    right: 170px;
+    height: 70px;
+    padding: 25px 0;
+    @include clearfix;
+    .progress_time {
+      position: absolute;
+      width: 40px;
+      top: 25px;
+      @include text-mini($lighter);
+      &.current {
+        text-align: right;
+        left: 0;
+      }
+      &.total {
+        text-align: left;
+        right: 0;
+      }
+    }
+    .progress_bar {
+      margin: 0 50px;
+      margin-top: 8px;
+      @include transition(.1s);
+    }
+    &:hover {
+      .progress_bar {
+        height: 6px;
+        margin-top: 7px;
+      }
+      .bar_handle {
+        top: -3px;
+        left: 0;
+        height: 12px;
+        width: 12px;
+        &:after {
+          top: 3px;
+          left: 3px;
+        }
+      }
+    }
+  }
+  .control_volume {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 70px;
+    width: 150px;
+    padding: 25px 0;
+    .volume_icon {
+      position: absolute;
+      top: 0;
+      font-size: 20px;
+      line-height: 70px;
+      color: $medium;
+    }
+    .volume_bar {
+      margin: 8px 20px 0 30px;
+      @include transition(.1s);
+      .bar_current {
+
+      }
+      .bar_handle {
+
+      }
+    }
+    &:hover {
+      .volume_bar {
+        height: 6px;
+        margin-top: 7px;
+      }
+      .bar_handle {
+        top: -3px;
+        left: 0;
+        height: 12px;
+        width: 12px;
+        &:after {
+          top: 3px;
+          left: 3px;
+        }
+      }
+    }
+  }
+}

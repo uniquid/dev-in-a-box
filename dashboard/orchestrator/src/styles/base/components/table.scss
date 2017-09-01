@@ -1,0 +1,175 @@
+table {
+  width: 100%;
+  thead {
+    border-bottom: 1px solid $p100;
+    tr {
+      td {
+        @include text-general-black($p100);
+        line-height: 30px;
+      }
+    }
+  }
+  tbody {
+    tr {
+      border-bottom: $separator;
+      &:hover {
+        background-color: $p700;
+        .table_icon {
+          .icon_container {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+        .table_title {
+          .title_info {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+      }
+      td {
+        @include text-general($p100);
+        line-height: 50px;
+        a {
+          color: $p100;
+          position: relative;
+          display: inline-block;
+          &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 0;
+            height: 1px;
+            background-color: $p100;
+            bottom: 10px;
+            @include transition(.2s);
+          }
+          &:hover {
+            &:after {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  tr {
+    max-height: 50px;
+    td {
+      max-height: 50px;
+      padding-left: 5px;
+      padding-right: 5px;
+      [class^="icon-"], [class*=" icon-"] {
+        font-size: 18px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        display: block;
+        text-indent: 2px;
+      }
+      .table-container {
+        @include truncate;
+      }
+      &.table_select {
+        width: 30px;
+      }
+      &.table_number {
+        width: 30px;
+      }
+      &.table_title {
+        .title_info {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          cursor: pointer;
+          background-color: $p300;
+          opacity: 0;
+          visibility: hidden;
+          @include transition(.2s);
+          span {
+            line-height: 30px;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+          }
+        }
+      }
+      &.table_interpreter {
+
+      }
+      &.table_author {
+
+      }
+      &.table_duration {
+        width: 60px;
+        text-align: right
+      }
+      &.table_icon {
+        width: 280px;
+        @include clearfix;
+        .icon_container {
+          float: right;
+          opacity: 0;
+          visibility: hidden;
+          max-height: 50px;
+          @include clearfix;
+          @include transition(.2s);
+          .container {
+            float: left;
+            width: 40px;
+            height: 40px;
+            margin-left: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            @include transition(.2s);
+            &:first-child {
+              margin-left: 0;
+            }
+            &:hover {
+              background-color: $p100;
+              color: $p700;
+            }
+            &.worklist {
+
+            }
+            &.download {
+
+            }
+            &.cut {
+
+            }
+            &.more {
+              .tooltip {
+                opacity: 0;
+                visibility: hidden;
+                top: 60px;
+              }
+              &:hover {
+                .tooltip {
+                  opacity: 1;
+                  visibility: visible;
+                  top: 50px;
+                }
+              }
+            }
+          }
+        }
+      }
+      &.table_price {
+        width: 60px;
+        text-align: right
+      }
+      &.table_use {
+        width: 90px;
+        text-align: right;
+        padding-right: 10px;
+      }
+    }
+  }
+}

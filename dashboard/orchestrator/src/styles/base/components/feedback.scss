@@ -1,0 +1,180 @@
+.feedback_container {
+    #feedback_modal {
+        margin: 0 auto;
+        background: $p100;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -320px;
+        box-shadow: 0 2px 20px 0px rgba(0,0,0,.4);
+        padding: 20px;
+        @include transition(.3s);
+        z-index: 999999999;
+        padding-bottom: 30px;
+        &.active {
+            top: 0px;
+        }
+        span {
+            display: block;
+            margin: 10px auto;
+            color: $accent-100;
+            text-align: center;
+            font-size: 18px;
+        }
+        .feedback_title {
+            @include text-title-regular($p900);
+            text-align: center;
+        }
+        .feedback_description {
+            @include text-general($p900);
+            text-align: center;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+        .feedback_actions {
+            text-align: center;
+            button {
+                display: block;
+                width: 140px;
+                border-radius: 2px;
+                background: $accent-100;
+                margin: 0 auto;
+                font-weight: 800;
+            }
+        }
+    }
+}
+
+
+#feedback {
+    height: 300px;
+    background: #f1f1f1;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999999;
+    bottom: -270px;
+    @include transition(.3s);
+    &.active {
+        bottom: 0;
+    }
+    .feedback_menu {
+        background:#016FB9;
+        height: 30px;
+        line-height: 30px;
+        @include clearfix;
+        .menu_right {
+            float: right;
+            line-height: 30px;
+            margin-right: 30px;
+            span {
+                cursor:pointer;
+                margin-left: 15px;
+                font-size: 13px;
+            }
+        }
+        .icon-globe {
+          float: left;
+          vertical-align: middle;
+          float: left;
+          font-size: 14px;
+          line-height: 30px;
+          width: 30px;
+          text-align: center;
+          background: #085488;
+        }
+
+        .menu_list{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            height: 30px;
+            float: left;
+            margin-left: 10px;
+            line-height: 30px;
+            @include clearfix;
+            .list_item {
+                float: left;
+                margin-right: 40px;
+                height: 30px;
+                line-height: 16px;
+                position: relative;
+                .item_total {
+                    background: rgba(245, 245, 245, 0.2);
+                    border-radius: 2px;
+                    padding: 2px 4px;
+                    vertical-align: middle;
+                    border-radius: 2px;
+                    margin-left: 5px;
+                    font-weight: 900;
+                }
+                &:last-of-type {
+                    position: static;
+                }
+                &:after {
+                    content: "";
+                    position: absolute;
+                    right: -20px;
+                    top: 7px;
+                    bottom: 7px;
+                    width: 1px;
+                    background: rgba(255, 255, 255, .2);
+                    display: block;
+                }
+                a {
+                    @include text-mini-black($p100);
+                    line-height: 30px;
+                    letter-spacing: 1px;
+                    height: 30px;
+                    font-size: 10px;
+                    height: 30px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+    .feedback_container {
+        margin: 0 auto;
+        .container_item {
+            margin-left: 20px;
+        }
+    }
+    .feedback_title {
+        @include text-title-regular($p700);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: 1px;
+        color: #2e3a42;
+        /* float: left; */
+        display: inline-block;
+        margin-top: 20px;
+    }
+    .feedback_description {
+        @include text-general($p900);
+        margin-top: 20px;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 20px;
+        letter-spacing: 2px;
+        color: #262f39;
+        margin-top: 0px;
+        display: block;
+    }
+    .feedback_actions {
+        @include clearfix;
+        margin-top: 40px;
+        .actions_close {
+            height: 30px;
+            background: $accent-100;
+            color: white;
+            text-align: center;
+            width: 140px;
+            border-radius: 4px;
+            @include text-mini($p100);
+
+        }
+    }
+}

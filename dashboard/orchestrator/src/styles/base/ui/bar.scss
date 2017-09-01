@@ -1,0 +1,38 @@
+.bar {
+  height: 4px;
+  background-color: $medium;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  .bar_current {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    background: $gradient;
+    border-radius: 4px;
+  }
+  .bar_handle {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    height: 8px;
+    width: 8px;
+    background-color: $lighter;
+    @include circle;
+    @include transition(.1s);
+    &:after {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      @include box-shadow(1px,1px,1px,0, rgba(0,0,0,.6), true);
+      @include circle;
+      @include transition(.1s);
+    }
+  }
+}

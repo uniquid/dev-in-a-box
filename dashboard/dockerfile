@@ -1,2 +1,6 @@
-FROM node:8.2.1
+FROM node:6.11.2
+COPY ["./orchestrator", "/usr/app"]
 WORKDIR /usr/app
+RUN ["npm", "install", "--save-dev"]
+EXPOSE 3000
+ENTRYPOINT ["npm", "start"]

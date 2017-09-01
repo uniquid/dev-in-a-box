@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="21px" height="40px" viewBox="0 0 21 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.6.1 (26313) - http://www.bohemiancoding.com/sketch -->
+    <title>select_arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="select_arrow" fill="#F5F5F5">
+            <path d="M7.07106781,11.4142136 L11.3137085,15.6568542 L9.89949494,17.0710678 L5.65685425,12.8284271 L7.07106781,11.4142136 Z M5.65685425,10 L7.07106781,11.4142136 L1.41421356,17.0710678 L-8.52651283e-14,15.6568542 L5.65685425,10 Z M7.07106781,27.8994949 L11.3137085,23.6568542 L9.89949494,22.2426407 L5.65685425,26.4852814 L7.07106781,27.8994949 Z M5.65685425,29.3137085 L7.07106781,27.8994949 L1.41421356,22.2426407 L-8.52651283e-14,23.6568542 L5.65685425,29.3137085 Z"></path>
+        </g>
+    </g>
+</svg>

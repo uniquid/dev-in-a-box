@@ -1,0 +1,43 @@
+.toast {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: auto;
+    border-radius: 4px;
+    border: 1px solid white;
+    background: white;
+    z-index: $zmax;
+    box-shadow: 0 2px 5px 1px rgba(0,0,0,.2);
+    &.success {
+        background: #57b748;
+        border: 1px solid #188c1c;
+    }
+    .toast_info {
+        padding: 10px;
+        float: left;
+        color: $p900;
+        border-right: $separator;
+        width: 200px;
+        h1 {
+            @include text-mini-black($p900);
+            text-transform: uppercase;
+
+        }
+        p {
+            @include text-general($p900);
+            margin: 0;
+        }
+    }
+    .toast_actions {
+        float: left;
+        color: $p900;
+        cursor: pointer;
+        border-radius: 0 4px 4px 0;
+        &:hover {
+            background: $p100;
+        }
+        @include text-mini($p900);
+        line-height: 60px;
+        padding: 0 10px;
+    }
+}
