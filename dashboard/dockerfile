@@ -1,6 +1,4 @@
-FROM node:6.11.2
-COPY ["./orchestrator", "/usr/app"]
-WORKDIR /usr/app
-RUN ["npm", "install", "--save-dev"]
-EXPOSE 3000
-ENTRYPOINT ["npm", "start"]
+FROM nginx:latest
+COPY ["./conf.json", "/usr/share/nginx/html"]
+COPY ["./build", "/usr/share/nginx/html"]
+COPY ["./dashboard.conf", "/etc/nginx/conf.d/dashboard.conf"]
