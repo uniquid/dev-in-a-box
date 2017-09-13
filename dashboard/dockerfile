@@ -3,4 +3,4 @@ RUN ["mkdir", "/html"]
 COPY ["./conf.json", "/html"]
 COPY ["./build", "/html"]
 COPY ["./dashboard.conf", "/etc/nginx/conf.d/default.conf"]
-EXPOSE 8080
+EXPOSE 8081
