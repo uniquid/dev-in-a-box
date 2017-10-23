@@ -1,0 +1,48 @@
+version: "3.3"
+
+services:
+  miner:
+    build: ../miner
+    image: uniquid/dev-miner
+    ports:
+      - 19000:19000
+    networks:
+      macvlan_net:
+          ipv4_address: $MINER_BRIDGED_IP
+      dev_net:
+
+  insight-api:
+    build: ../insight-api
+    image: uniquid/dev-insight-api
+    ports:
+      - 3001:3001
+    networks:
+      dev_net:
+    links:
+      - miner
+
+  mqtt:
+    build: ../mqtt
+    image: uniquid/dev-mqtt
+    ports:
+      - 1883:1883
+      - 1884:1884
+    networks:
+      dev_net:
+
+networks:
+  macvlan_net:
+    driver: macvlan
+    driver_opts:
+      parent: $MACVLAN_BRIDGE_TO_IF
+      gateway: $MACVLAN_GATEWAY_IP
+    ipam:
+      config:
+        - subnet: $MACVLAN_SUBNET_MASK
+          # ip_range: $IP_RANGE # 10.25.87.32/28 # IP from this pool are assigned automatically
+  dev_net:
+    driver: bridge
+
+# volumes:
+#   uniquid_bitcoin_volume:
+#     external: true
