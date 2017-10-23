@@ -1,0 +1,31 @@
+{
+  "name": "tabacchi",
+  "version": "1.1.0",
+  "description": "REST service for bitcoin topups on our Regtest network",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/uniquid/tabacchi.git"
+  },
+  "keywords": [
+    "rest",
+    "service",
+    "faucet",
+    "bitcoin",
+    "blockchain"
+  ],
+  "author": "Alessio Biancalana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uniquid/tabacchi/issues"
+  },
+  "homepage": "https://github.com/uniquid/tabacchi#readme",
+  "dependencies": {
+    "child-process-promise": "^2.2.0",
+    "cors": "^2.8.1",
+    "fastify": "^0.12.0"
+  }
+}
