@@ -1,0 +1,4 @@
+FROM kylemanna/bitcoind
+
+COPY bitcoin.conf /bitcoin/.bitcoin/bitcoin.conf
+EXPOSE 19000

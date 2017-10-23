@@ -1,0 +1,33 @@
+FROM node:8
+RUN git clone https://github.com/bitpay/bitcore-node.git
+WORKDIR /bitcore-node
+RUN npm install -g
+WORKDIR /
+RUN bitcore-node create uniquid_node
+WORKDIR /uniquid_node
+RUN bitcore-node install insight-ui
+RUN bitcore-node install insight-api
+
+WORKDIR /uniquid_node/node_modules
+RUN rm -Rf insight-api
+RUN git clone https://github.com/bitpay/insight-api.git
+WORKDIR /uniquid_node/node_modules/insight-api
+RUN npm install
+
+# if this is not going to be used, .bowerrc can be deleted
+#
+# WORKDIR /uniquid_node/node_modules
+# RUN rm -Rf insight-ui
+# RUN git clone https://github.com/bitpay/insight.git
+# RUN mv insight insight-ui
+# WORKDIR /uniquid_node/node_modules/insight-ui
+# RUN npm install --save-dev
+# COPY .bowerrc .
+# RUN npm run build
+
+WORKDIR /uniquid_node
+COPY bitcore-node.json .
+# if this is not going to be used, bitcoin.conf can be deleted
+#
+# COPY bitcoin.conf /root/.bitcore/data/bitcoin.conf
+ENTRYPOINT bitcore-node start
