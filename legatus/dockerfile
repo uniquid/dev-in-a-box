@@ -1,0 +1,7 @@
+FROM node:8
+
+COPY package.json .
+RUN npm install
+COPY index.js .
+
+ENTRYPOINT npm start
