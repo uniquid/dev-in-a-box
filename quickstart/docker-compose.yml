@@ -73,6 +73,7 @@ services:
   dashboard:
     build: ../dashboard
     image: uniquid/dev-dashboard
+    env_file: .env
     ports:
       - 8081:8081
 

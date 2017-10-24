@@ -23,9 +23,6 @@
   },
 
   "config": {
-    "bcAPI": "http://localhost:3001/insight",
-    "registryURL": "http://localhost:8080/registry",
-    "imprinterApiUrl": "http://localhost:8090/api/v1/",
-    "tabacchiApiUrl": "http://localhost:8000/"
-  }
-}
+    "bcAPI": "http://127.0.0.1:3001/insight",
+    "registryURL": "http://127.0.0.1:8080/registry",
+    "imprinterApiUrl": "http://127.0.0.1:8090/api/v1/",
