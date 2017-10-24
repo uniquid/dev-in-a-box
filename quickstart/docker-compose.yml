@@ -50,6 +50,16 @@ services:
     networks:
       dev_net:
 
+  imprinter:
+    build: ../imprinter
+    image: uniquid/dev-imprinter
+    env_file: .env
+    ports:
+      - 8090:8090
+    networks:
+      dev_net:
+      macvlan_net:
+          ipv4_address: $IMPRINTER_IP
 
 networks:
   macvlan_net:
