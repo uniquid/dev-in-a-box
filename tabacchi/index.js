@@ -2,7 +2,7 @@
 
 const tabacchi = require('fastify')()
 const exec = require('child-process-promise').exec
-var base_cmd = `bitcoin-cli --rpcuser=$MINER_RPC_USER --rpcpassword=$MINER_RPC_PASSWORD --rpcconnect=$MINER_RPC_IP -rpcport=18332 -regtest`
+var base_cmd = `bitcoin-cli --rpcuser=usr --rpcpassword=pwd --rpcconnect=172.18.0.10 -rpcport=18332 -regtest`
 
 var lifecycle = {
     currentlyMining: 0,

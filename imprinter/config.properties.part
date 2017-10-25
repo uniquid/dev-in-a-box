@@ -12,4 +12,5 @@ autorecovery.threshold=5
 insightapi.url=http\://insight-api\:3001
 registry.url=http\://registry\:8080
 log.level=INFO
-bc.peers=172.18.0.10
+#this below will be set runtime
+#bc.peers=xxx.xxx.xxx.xxx
