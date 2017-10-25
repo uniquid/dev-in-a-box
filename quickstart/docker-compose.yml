@@ -4,6 +4,7 @@ services:
   miner:
     build: ../miner
     image: uniquid/dev-miner
+    env_file: .env
     ports:
       - 19000:19000
     networks:
