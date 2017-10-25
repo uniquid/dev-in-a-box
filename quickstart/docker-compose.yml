@@ -77,7 +77,10 @@ services:
     ports:
       - 8081:8081
 
-
+# Error response from daemon: network dm-xxx is already using parent interface yyy
+# rm /var/lib/docker/network/files/local-kv.db
+# restart dockerd
+# https://github.com/docker/libnetwork/issues/1743
 networks:
   macvlan_net:
     driver: macvlan
@@ -89,3 +92,6 @@ networks:
         - subnet: $MACVLAN_SUBNET_MASK
   dev_net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
