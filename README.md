@@ -43,3 +43,5 @@ The tank start script takes an id as argument, appended to the newly started tan
 ./start-tank-java.sh 1
 ```
 
+Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
+
