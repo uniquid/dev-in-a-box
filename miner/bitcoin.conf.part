@@ -1,8 +1,0 @@
-regtest=1
-rpcuser=usr
-rpcpassword=pwd
-server=1
-port=19000
-#those below are added at runtime
-#rpcbind=xxx.xxx.xxx.xxx
-#rpcallowip=xxx.xxx.xxx.xxx

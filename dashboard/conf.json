@@ -1,0 +1,31 @@
+{
+  "communicationType": {
+    "createNewContext": 2,
+    "getNodes": 4,
+    "getContexts": 5,
+    "getContracts": 6,
+    "getImprintedNodes": 10,
+    "auth": 32,
+    "sync": 33,
+    "sendContract": 120,
+    "getUserInfo": 121,
+    "deleteContract": 122
+  },
+
+  "contractType": {
+    "orchestration": "Orchestration",
+    "revocation": "Revocation",
+    "access": "Access"
+  },
+
+  "uidError": {
+    "insufficientBalance": -1
+  },
+
+  "config": {
+    "bcAPI": "http://52.167.211.151:3001/insight-api",
+    "registryURL": "http://127.0.0.1:8080/registry",
+    "imprinterApiUrl": "http://127.0.0.1:8090/api/v1/",
+    "tabacchiApiUrl": "http://52.225.217.168:8000/"
+  }
+}

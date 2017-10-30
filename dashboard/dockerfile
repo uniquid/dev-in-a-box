@@ -2,8 +2,9 @@ FROM nginx:latest
 RUN ["mkdir", "/html"]
 COPY ["./dashboard.conf", "/etc/nginx/conf.d/default.conf"]
 COPY ["./build", "/html"]
-COPY ["./conf.json.part", "."]
-COPY ["./start.sh", "."]
+# COPY ["./conf.json.part", "."]
+COPY ["./conf.json", "/html/conf.json"]
+# COPY ["./start.sh", "."]
 EXPOSE 8081
 
-ENTRYPOINT ./start.sh
+# ENTRYPOINT ./start.sh
