@@ -29,5 +29,7 @@ WORKDIR /uniquid_node
 COPY bitcore-node.json .
 # if this is not going to be used, bitcoin.conf can be deleted
 #
-# COPY bitcoin.conf /root/.bitcore/data/bitcoin.conf
+COPY bitcoin.conf /root/.bitcore/data/bitcoin.conf
+COPY bitcoin.conf /root/.bitcore/data/regtest/bitcoin.conf
+EXPOSE 19000
 ENTRYPOINT bitcore-node start

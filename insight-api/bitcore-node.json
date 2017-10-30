@@ -20,19 +20,24 @@
   "servicesConfig": {
     "p2p": {
       "peers": [
-        { "ip": { "v4": "miner" } , "port":19000}
+        { "ip": { "v4": "172.18.0.13" } , "port":19000},
+        { "ip": { "v4": "172.18.0.12" } , "port":19000},
+        { "ip": { "v4": "172.18.0.11" } , "port":19000},
+        { "ip": { "v4": "172.18.0.10" } , "port":19000}
       ]
+    },
+    "bitcoind": {
+      "spawn": {
+        "datadir": "/root/.bitcore/data",
+        "regtest": true,
+        "port": 19000
+      }
     },
     "insight-api": {
       "cwdRequirePath": "node_modules/insight-api"
     },
     "insight-ui": {
       "cwdRequirePath": "node_modules/insight-ui"
-    },
-    "bitcoind": {
-      "network":{
-        "port": "19000"
-      }
     }
   }
 }

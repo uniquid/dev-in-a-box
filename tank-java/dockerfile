@@ -1,6 +1,6 @@
 FROM openjdk
 
-COPY tank-java-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar .
+COPY tank-java-0.1-RC1-SNAPSHOT-jar-with-dependencies_3.jar ./tank-java-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar
 COPY start.sh .
 COPY config.properties .
 

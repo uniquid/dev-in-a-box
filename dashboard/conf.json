@@ -26,6 +26,7 @@
     "bcAPI": "http://127.0.0.1:3001/insight",
     "registryURL": "http://127.0.0.1:8080/registry",
     "imprinterApiUrl": "http://127.0.0.1:8090/api/v1/",
-    "tabacchiApiUrl": "http://127.0.0.1:8000/"
+    "tabacchiApiUrl": "http://127.0.0.1:8000/",
+    "legatusUrl": "http://127.0.0.1:3000"
   }
 }
