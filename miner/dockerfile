@@ -1,9 +1,0 @@
-FROM kylemanna/bitcoind
-
-COPY start.sh .
-COPY bitcoin.conf.part /bitcoin/.bitcoin/bitcoin.conf.part
-# COPY bitcoin.conf.part .
-
-EXPOSE 19000
-
-ENTRYPOINT ./start.sh

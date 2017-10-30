@@ -1,28 +1,6 @@
 version: "3.3"
 
 services:
-  miner:
-    build: ../miner
-    image: uniquid/dev-miner
-    env_file: .env
-    ports:
-      - 19000:19000
-    networks:
-      macvlan_net:
-          ipv4_address: $MINER_RPC_IP
-      dev_net:
-          ipv4_address: 172.18.0.100
-
-  insight-api:
-    build: ../insight-api
-    image: uniquid/dev-insight-api
-    ports:
-      - 3001:3001
-    networks:
-      dev_net:
-    links:
-      - miner
-
   mqtt:
     build: ../mqtt
     image: uniquid/dev-mqtt
@@ -30,19 +8,8 @@ services:
       - 1883:1883
       - 1884:1884
     networks:
-      dev_net:
-
-  tabacchi:
-    build: ../tabacchi
-    image: uniquid/dev-tabacchi
-    env_file: .env
-    ports:
-      - 8000:8000
-    networks:
-      macvlan_net:
-          ipv4_address: $TABACCHI_IP
-    links:
-      - miner
+      default:
+        ipv4_address: 172.18.0.3
 
   registry:
     build: ../registry
@@ -50,7 +17,8 @@ services:
     ports:
       - 8080:8080
     networks:
-      dev_net:
+      default:
+        ipv4_address: 172.18.0.5
 
   imprinter:
     build: ../imprinter
@@ -59,9 +27,11 @@ services:
     ports:
       - 8090:8090
     networks:
-      dev_net:
-      macvlan_net:
-          ipv4_address: $IMPRINTER_IP
+      default:
+        ipv4_address: 172.18.0.6
+    links:
+      - mqtt
+      - registry
 
   legatus:
     build: ../legatus
@@ -69,7 +39,8 @@ services:
     ports:
       - 3000:3000
     networks:
-      dev_net:
+      default:
+        ipv4_address: 172.18.0.7
 
   dashboard:
     build: ../dashboard
@@ -77,22 +48,12 @@ services:
     env_file: .env
     ports:
       - 8081:8081
+    networks:
+      default:
+        ipv4_address: 172.18.0.8
 
-# Error response from daemon: network dm-xxx is already using parent interface yyy
-# rm /var/lib/docker/network/files/local-kv.db
-# restart dockerd
-# https://github.com/docker/libnetwork/issues/1743
 networks:
-  macvlan_net:
-    driver: macvlan
-    driver_opts:
-      parent: $MACVLAN_BRIDGE_TO_IF
-      gateway: $MACVLAN_GATEWAY_IP
+  default:
     ipam:
       config:
-        - subnet: $MACVLAN_SUBNET_MASK
-  dev_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/24
+        - subnet: 172.18.0.0/16
