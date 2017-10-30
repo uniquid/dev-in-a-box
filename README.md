@@ -28,7 +28,7 @@ Quick start
 Clone repo and build docker images
 ```
 git clone https://github.com/uniquid/dev-in-a-box.git
-cd quickstart
+cd dev-in-a-box/quickstart
 ./build.sh
 ```
 Start system
