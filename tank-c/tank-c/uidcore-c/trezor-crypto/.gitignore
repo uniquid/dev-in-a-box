@@ -1,0 +1,9 @@
+*.o
+*.exe
+*~
+test-openssl
+test_speed
+tests
+*.os
+*.so
+*.pyc
