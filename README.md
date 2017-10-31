@@ -18,8 +18,8 @@ Released as a `docker-compose` project
 
 System requirements
 -------------------
-- [docker engine](https://docs.docker.com/engine/installation/)
-- [docker-compose](https://docs.docker.com/compose/install/)
+- [docker engine](https://docs.docker.com/engine/installation/) v17.06+
+- [docker-compose](https://docs.docker.com/compose/install/) v1.14+
 - internet connection for accessing our blockchain infrastructure
 
 Quick start
@@ -35,7 +35,7 @@ Start system
 ```
 docker-compose up
 ```
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
 Tank start scripts take an id as argument, appended to the newly started tank-java or tank-c container's name
 ```
 # starts a java tank container named tank-java-1
