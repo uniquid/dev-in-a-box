@@ -35,13 +35,18 @@ Start system
 ```
 docker-compose up
 ```
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) acting as IOT device.
-The tank start script takes an id as argument, appended to the newly started tank-java container's name
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
+Tank start scripts take an id as argument, appended to the newly started tank-java or tank-c container's name
 ```
 # starts a java tank container named tank-java-1
 
 ./start-tank-java.sh 1
+
+
+# starts a c tank container named tank-c-1
+
+./start-tank-c.sh 1
 ```
 
-Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
+Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator) and watch bitcoin transactions describing the contracts between nodes at our infrastructure [bc-insight](http://52.167.211.151:3001/insight)
 
