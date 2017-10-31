@@ -1,0 +1,6 @@
+[submodule "uidcore-c"]
+	path = uidcore-c
+	url = git@github.com:uniquid/uidcore-c.git
+[submodule "paho.mqtt.c"]
+	path = paho.mqtt.c
+	url = git@github.com:uniquid/paho.mqtt.c.git

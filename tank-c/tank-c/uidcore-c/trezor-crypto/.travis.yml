@@ -1,0 +1,21 @@
+sudo: false
+language: c
+
+addons:
+  apt:
+    packages:
+    - check
+    - libssl-dev
+    - python-pip
+
+install:
+  - pip install --user pytest ecdsa
+
+script:
+  - make
+  - ./tests
+  - ./test-openssl 1000
+  - ITERS=10 py.test
+  - mkdir _build && cd _build
+  - cmake ..
+  - make

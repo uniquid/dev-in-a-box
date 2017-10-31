@@ -1,0 +1,6 @@
+[submodule "yajl"]
+	path = yajl
+	url = git@github.com:uniquid/yajl.git
+[submodule "trezor-crypto"]
+	path = trezor-crypto
+	url = git@github.com:uniquid/trezor-crypto.git
