@@ -35,17 +35,23 @@ Start system
 ```
 docker-compose up
 ```
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
-Tank start scripts take an id as argument, appended to the newly started tank-java or tank-c container's name
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
 ```
-# starts a java tank container named tank-java-1
-
-./start-tank-java.sh 1
-
-
-# starts a c tank container named tank-c-1
-
-./start-tank-c.sh 1
+# usage:
+# tank {java|c} {start|stop|kill|rm} from_index [to_index]
+#
+# examples:
+#
+# start a java tank container named tank-java-1
+./tank java start 1
+# start 3 c tank containers named tank-c-2 ... tank-c-4
+./tank c start 2 4
+# stop from tank-java-3 to tank-java-5
+./tank c stop 3 5
+# kill tank-java-3
+./tank java kill 3
+# remove tank-java-2 to tank-java-6
+./tank java rm 2 6
 ```
 
 Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator) and watch bitcoin transactions describing the contracts between nodes at our infrastructure [bc-insight](http://52.167.211.151:3001/insight)
