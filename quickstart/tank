@@ -1,0 +1,51 @@
+#!/bin/bash
+TYPE=$1
+ACTION=$2
+FROM=$3
+TO=${4:-$3}
+function usage {
+  echo "Usage: $0 {java|c} {start|stop|kill|rm} from_index [to_index]"
+  exit 1
+}
+if [ -z $ACTION ]
+  then usage
+fi
+if [ -z $TYPE ]
+  then usage
+fi
+if [ -z $FROM ]
+  then usage
+fi
+
+case $TYPE in
+  java|c)
+    true
+    ;;
+  *)
+   usage
+   ;;
+esac
+
+case $ACTION in
+  start|stop|kill|rm)
+    true
+    ;;
+  *)
+   usage
+   ;;
+esac
+
+
+for INDEX in $(seq $FROM $TO); do
+  CONTAINER_NAME=tank-$TYPE-$INDEX
+
+  EXISTING_CONTAINER_ID=$(docker ps -q -a -f name="$CONTAINER_NAME")
+
+  if [ -z $EXISTING_CONTAINER_ID ] && [ $ACTION = start ]
+    then
+      docker run -td --network uniquid_default --name=$CONTAINER_NAME uniquid/dev-tank-$TYPE
+    else
+      docker $ACTION $CONTAINER_NAME
+  fi
+
+done
