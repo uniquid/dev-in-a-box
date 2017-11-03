@@ -28,17 +28,10 @@ Clone repo and build docker images
 ```
 git clone https://github.com/uniquid/dev-in-a-box.git
 cd dev-in-a-box/quickstart
-```
-Manage System
--------------
-In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
-
-Now build Uniquid images
-```
 ./uniquid build
 ```
 
-And start Uniquid System
+Start Uniquid System
 ```
 ./uniquid start
 ```
@@ -99,8 +92,10 @@ The system is currently using our Blockchain network infrastructure.
 It will likely be embedded in the box in future releases.
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
-### Uniquid script
-Further commands are available in `uniquid` script, as shown in usage help
+Manage System
+-------------
+In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
+A few commands are available in `uniquid` script, as shown in usage help
 ```
 ./uniquid
 Usage: ./uniquid {clean|build|log|start|stop|kill}
