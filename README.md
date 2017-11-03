@@ -33,7 +33,12 @@ Manage System
 -------------
 In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
 
-Now build Uniquid images start the Uniquid System
+Now build Uniquid images
+```
+./uniquid build
+```
+
+And start Uniquid System
 ```
 ./uniquid start
 ```
