@@ -32,28 +32,12 @@ cd dev-in-a-box/quickstart
 Manage System
 -------------
 In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
+
+Now build Uniquid images start the Uniquid System
 ```
-#Usage:
-#./uniquid {clean|build|log|start|stop|kill}
-
-#kill and cleans up all Uniquid's containers, images and networks
-./uniquid clean
-
-#clean and builds Uniquid's images
-./uniquid build
-
-#start Uniquid system
 ./uniquid start
-
-#stop Uniquid system
-./uniquid stop
-
-#kill Uniquid system
-./uniquid kill
-
-#logs from Uniquid system
-./uniquid log
 ```
+
 When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
 `tank` script is what you need
 ```
@@ -78,4 +62,50 @@ When the system is up you may want to start some [Java tank simulator](https://g
 ./tank java rm 2 6
 ```
 
-Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator) and watch bitcoin transactions describing the contracts between nodes at our infrastructure [bc-insight](http://52.167.211.151:3001/insight)
+Check System Components
+-----------------------
+System components are exposed to the host machine on the respective published ports:
+
+| service          | port                      | port             |
+|------------------|---------------------------|------------------|
+| Imprinter        | 8090 - HTTP Services      |                  |
+| Registry         | 8080 - HTTP Services      |                  |
+| Legatus          | 3000 - WebSocket Services |                  |
+| MQTT - Mosquitto | 1833 - TCP                | 1844 - WebSocket |
+| Dashboard        | 8081 - Web App            |                  |
+
+###Imprinter
+Check Imprinter is up on your browser at `http://localhost:8090/`
+
+###Registry
+Check Registry is up on your browser at `http://localhost:8080/`
+
+###Legatus
+Check Legatus is up on your browser at `http://localhost:3000/`
+
+###MQTT
+You may want to check MQTT is up using a web service like http://www.hivemq.com/demos/websocket-client/ and specifying host to `localhost` and the port to `1884`
+
+###Dashboard
+Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
+
+###Blockchain
+The system is currently using our Blockchain network infrastructure.
+It will likely be embedded in the box in future releases.
+You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
+
+###Uniquid script
+Further commands are available in `uniquid` script, as shown in usage help
+```
+./uniquid
+Usage: ./uniquid {clean|build|log|start|stop|kill}
+
+Script for managing uniquid dev-in-a-box
+clean: kills and cleans up all uniquid's containers, images and networks
+build: builds uniquid's images
+start: starts uniquid system
+stop: stops uniquid system
+kill: kills uniquid system
+log: logs from uniquid system
+
+```

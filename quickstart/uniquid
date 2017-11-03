@@ -5,7 +5,7 @@ function usage {
   echo ""
   echo "Script for managing uniquid dev-in-a-box"
   echo "clean: kills and cleans up all uniquid's containers, images and networks"
-  echo "build: cleans and builds uniquid's images"
+  echo "build: builds uniquid's images"
   echo "start: starts uniquid system"
   echo "stop: stops uniquid system"
   echo "kill: kills uniquid system"
@@ -48,7 +48,6 @@ function kill {
 }
 
 function start {
-  build
   docker-compose up -d
 }
 
@@ -57,7 +56,6 @@ function log {
 }
 
 function build {
-  clean
   docker build -t uniquid/dev-tank-c ../tank-c
   docker build -t uniquid/dev-tank-java ../tank-java
   docker-compose build
