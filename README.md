@@ -64,7 +64,7 @@ When the system is up you may want to start some [Java tank simulator](https://g
 
 Check System Components
 -----------------------
-System components are exposed to the host machine on the respective published ports:
+When system is up components are exposed to the host machine on the respective published ports:
 
 | service          | port                      | port             |
 |------------------|---------------------------|------------------|
@@ -74,27 +74,27 @@ System components are exposed to the host machine on the respective published po
 | MQTT - Mosquitto | 1833 - TCP                | 1844 - WebSocket |
 | Dashboard        | 8081 - Web App            |                  |
 
-###Imprinter
+### Imprinter
 Check Imprinter is up on your browser at `http://localhost:8090/`
 
-###Registry
+### Registry
 Check Registry is up on your browser at `http://localhost:8080/`
 
-###Legatus
+### Legatus
 Check Legatus is up on your browser at `http://localhost:3000/`
 
-###MQTT
-You may want to check MQTT is up using a web service like http://www.hivemq.com/demos/websocket-client/ and specifying host to `localhost` and the port to `1884`
+### MQTT
+You may want to check MQTT is up using a web service like http://www.hivemq.com/demos/websocket-client/ and specifying host to `localhost` and the port `1884`
 
-###Dashboard
+### Dashboard
 Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
 
-###Blockchain
+### Blockchain
 The system is currently using our Blockchain network infrastructure.
 It will likely be embedded in the box in future releases.
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
-###Uniquid script
+### Uniquid script
 Further commands are available in `uniquid` script, as shown in usage help
 ```
 ./uniquid
