@@ -43,7 +43,7 @@ for INDEX in $(seq $FROM $TO); do
 
   if [ -z $EXISTING_CONTAINER_ID ] && [ $ACTION = start ]
     then
-      docker run -td --network uniquid_default --name=$CONTAINER_NAME uniquid/dev-tank-$TYPE
+      docker run -tdi --network uniquid_default --name=$CONTAINER_NAME uniquid/dev-tank-$TYPE
     else
       docker $ACTION $CONTAINER_NAME
   fi

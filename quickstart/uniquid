@@ -1,0 +1,74 @@
+#!/bin/bash
+ACTION=$1
+function usage {
+  echo "Usage: $0 {clean|build|log|start|stop|kill}"
+  echo ""
+  echo "Script for managing uniquid dev-in-a-box"
+  echo "clean: kills and cleans up all uniquid's containers, images and networks"
+  echo "build: cleans and builds uniquid's images"
+  echo "start: starts uniquid system"
+  echo "stop: stops uniquid system"
+  echo "kill: kills uniquid system"
+  echo "log: logs from uniquid system"
+  exit 1
+}
+function for_each_uniquid_container {
+  docker ps -a --format "{{.Names}}:{{.Image}}" | while read PS_LINE; do
+    IFS=':' read -a PS_PARTS <<< "$PS_LINE"
+    IMAGE_NAME=${PS_PARTS[1]}
+    if [[ $IMAGE_NAME == uniquid\/* ]]
+      then
+        CONTAINER_NAME=${PS_PARTS[0]}
+        $@ $CONTAINER_NAME
+    fi
+  done
+}
+
+function clean {
+  kill
+  for_each_uniquid_container docker rm
+
+  docker images --format "{{.Repository}}" | grep uniquid\/ | while read IMAGE_NAME; do
+    docker rmi $IMAGE_NAME
+  done
+
+  docker network ls --format "{{.Name}}" | grep uniquid_ | while read NETWORK_NAME; do
+    docker network rm $NETWORK_NAME
+  done
+}
+
+function stop {
+  docker-compose stop
+  for_each_uniquid_container docker stop
+}
+
+function kill {
+  docker-compose kill
+  for_each_uniquid_container docker kill
+}
+
+function start {
+  build
+  docker-compose up -d
+}
+
+function log {
+  docker-compose logs -f --tail=20
+}
+
+function build {
+  clean
+  docker build -t uniquid/dev-tank-c ../tank-c
+  docker build -t uniquid/dev-tank-java ../tank-java
+  docker-compose build
+}
+
+
+case $ACTION in
+  clean|build|log|start|stop|kill)
+    $ACTION
+    ;;
+  *)
+   usage
+   ;;
+esac

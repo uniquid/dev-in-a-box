@@ -9,7 +9,6 @@ This box provide a base set with:
 
 * **[Dashboard]**
 * **[Massive Imprinter]**
-* **[Orchestrator Backend]**
 * **[Registry Backend]**
 * **[Legatus Backend]**
 * **[Mosquito MQTT]**
@@ -29,27 +28,52 @@ Clone repo and build docker images
 ```
 git clone https://github.com/uniquid/dev-in-a-box.git
 cd dev-in-a-box/quickstart
-./build.sh
 ```
-Start system
+Manage System
+-------------
+In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
 ```
-docker-compose up
+#Usage:
+#./uniquid {clean|build|log|start|stop|kill}
+
+#kill and cleans up all Uniquid's containers, images and networks
+./uniquid clean
+
+#clean and builds Uniquid's images
+./uniquid build
+
+#start Uniquid system
+./uniquid start
+
+#stop Uniquid system
+./uniquid stop
+
+#kill Uniquid system
+./uniquid kill
+
+#logs from Uniquid system
+./uniquid log
 ```
 When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
+`tank` script is what you need
 ```
 # usage:
 # tank {java|c} {start|stop|kill|rm} from_index [to_index]
 #
 # examples:
-#
+
 # start a java tank container named tank-java-1
 ./tank java start 1
+
 # start 3 c tank containers named tank-c-2 ... tank-c-4
 ./tank c start 2 4
+
 # stop from tank-java-3 to tank-java-5
 ./tank c stop 3 5
+
 # kill tank-java-3
 ./tank java kill 3
+
 # remove tank-java-2 to tank-java-6
 ./tank java rm 2 6
 ```
