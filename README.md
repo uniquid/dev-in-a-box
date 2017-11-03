@@ -4,7 +4,7 @@ Description
 ------------
 
 
-UniquID Dev-in-a-box is a containerized environment that allow the developers to start experiments with the UniquID BLAST ecosystem.
+UniquID Dev-in-a-box is a containerized environment that allow the developers to start experiments with the UniquID BLAST ecosystem.    
 This box provide a base set with:
 
 * **[Dashboard]**
@@ -36,7 +36,7 @@ Start Uniquid System
 ./uniquid start
 ```
 
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.   
 `tank` script is what you need
 ```
 # usage:
@@ -70,7 +70,7 @@ When system is up components are exposed to the host machine on the respective p
 | Registry         | 8080 - HTTP Services      |                  |
 | Legatus          | 3000 - WebSocket Services |                  |
 | MQTT - Mosquitto | 1833 - TCP                | 1844 - WebSocket |
-| Dashboard        | 8081 - Web App            |                  |
+| Dashboard        | 8081 - Web Client         |                  |
 
 ### Imprinter
 Check Imprinter is up on your browser at `http://localhost:8090/`
@@ -82,19 +82,19 @@ Check Registry is up on your browser at `http://localhost:8080/`
 Check Legatus is up on your browser at `http://localhost:3000/`
 
 ### MQTT
-You may want to check MQTT is up using a web service like http://www.hivemq.com/demos/websocket-client/ and specifying host to `localhost` and the port `1884`
+You may want to check MQTT is up using a web client like http://www.hivemq.com/demos/websocket-client/ and specifying host to `localhost` and the port `1884`
 
 ### Dashboard
 Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
 
 ### Blockchain
-The system is currently using our Blockchain network infrastructure.
-It will likely be embedded in the box in future releases.
+The system is currently using our Blockchain network infrastructure.    
+It will likely be embedded in the box in future releases.    
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
 Manage System
 -------------
-In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project
+In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project   
 A few commands are available in `uniquid` script, as shown in usage help
 ```
 ./uniquid
