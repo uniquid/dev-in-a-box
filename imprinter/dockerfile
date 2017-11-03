@@ -1,9 +1,8 @@
 FROM openjdk
 
 COPY massive-imprinter-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar .
-COPY start.sh .
 COPY config.properties .
 
 EXPOSE 8090
 
-ENTRYPOINT ./start.sh
+ENTRYPOINT java -jar massive-imprinter-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar config.properties
