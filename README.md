@@ -98,7 +98,7 @@ In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniqu
 A few commands are available in `uniquid` script, as shown in usage help
 ```
 ./uniquid
-Usage: ./quickstart/uniquid {clean|purge|build|log|start|stop|kill}
+Usage: ./uniquid {clean|purge|build|log|start|stop|kill}
 
 Script for managing Uniquid dev-in-a-box
 purge: kills and removes all Uniquid's containers, images and networks
