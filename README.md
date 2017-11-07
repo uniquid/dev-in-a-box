@@ -102,7 +102,7 @@ Usage: ./uniquid {clean|purge|build|log|start|stop|kill}
 
 Script for managing Uniquid dev-in-a-box
 purge: kills and removes all Uniquid's containers, images and networks
-clean {imprinter|registry}: cleanup of Uniquid service's state
+clean {imprinter|registry}: cleanup of Uniquid service's state: Note:service should be up and running
 build: builds Uniquid's images
 start: starts Uniquid system
 stop: stops Uniquid system
