@@ -1,15 +1,16 @@
 #!/bin/bash
 ACTION=$1
 function usage {
-  echo "Usage: $0 {clean|build|log|start|stop|kill}"
+  echo "Usage: $0 {clean|purge|build|log|start|stop|kill}"
   echo ""
-  echo "Script for managing uniquid dev-in-a-box"
-  echo "clean: kills and cleans up all uniquid's containers, images and networks"
-  echo "build: builds uniquid's images"
-  echo "start: starts uniquid system"
-  echo "stop: stops uniquid system"
-  echo "kill: kills uniquid system"
-  echo "log: logs from uniquid system"
+  echo "Script for managing Uniquid dev-in-a-box"
+  echo "purge: kills and removes all Uniquid's containers, images and networks"
+  echo "clean {imprinter|registry}: cleanup of Uniquid service's state"
+  echo "build: builds Uniquid's images"
+  echo "start: starts Uniquid system"
+  echo "stop: stops Uniquid system"
+  echo "kill: kills Uniquid system"
+  echo "log: logs from Uniquid system"
   exit 1
 }
 function for_each_uniquid_container {
@@ -24,7 +25,7 @@ function for_each_uniquid_container {
   done
 }
 
-function clean {
+function purge {
   kill
   for_each_uniquid_container docker rm
 
@@ -35,6 +36,23 @@ function clean {
   docker network ls --format "{{.Name}}" | grep uniquid_ | while read NETWORK_NAME; do
     docker network rm $NETWORK_NAME
   done
+}
+
+function clean {
+  SERVICE=$1
+  case $SERVICE in
+    imprinter|registry)
+      echo "removing data for $SERVICE"
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-wal
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-shm
+      docker-compose restart $SERVICE
+      ;;
+    *)
+    echo "WW $SERVICE"
+     usage
+     ;;
+  esac
 }
 
 function stop {
@@ -63,8 +81,8 @@ function build {
 
 
 case $ACTION in
-  clean|build|log|start|stop|kill)
-    $ACTION
+  clean|purge|build|log|start|stop|kill)
+    $ACTION $2
     ;;
   *)
    usage
