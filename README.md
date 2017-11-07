@@ -94,18 +94,18 @@ You may want to watch bitcoin transactions representing the contracts between no
 
 Manage System
 -------------
-In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid's docker images, containers and compose project   
+In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid services, images and containers   
 A few commands are available in `uniquid` script, as shown in usage help
 ```
 ./uniquid
-Usage: ./uniquid {clean|build|log|start|stop|kill}
+Usage: ./quickstart/uniquid {clean|purge|build|log|start|stop|kill}
 
-Script for managing uniquid dev-in-a-box
-clean: kills and cleans up all uniquid's containers, images and networks
-build: builds uniquid's images
-start: starts uniquid system
-stop: stops uniquid system
-kill: kills uniquid system
-log: logs from uniquid system
-
+Script for managing Uniquid dev-in-a-box
+purge: kills and removes all Uniquid's containers, images and networks
+clean {imprinter|registry}: cleanup of Uniquid service's state
+build: builds Uniquid's images
+start: starts Uniquid system
+stop: stops Uniquid system
+kill: kills Uniquid system
+log: logs from Uniquid system
 ```
