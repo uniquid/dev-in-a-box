@@ -36,6 +36,8 @@ Start Uniquid System
 ./uniquid start
 ```
 
+Start Tank examples
+-------------------
 When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.   
 `tank` script is what you need
 ```
