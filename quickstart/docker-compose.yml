@@ -1,0 +1,59 @@
+version: "3.3"
+
+services:
+  mqtt:
+    build: ../mqtt
+    image: uniquid/dev-mqtt
+    ports:
+      - 1883:1883
+      - 1884:1884
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+
+  registry:
+    build: ../registry
+    image: uniquid/dev-registry
+    ports:
+      - 8080:8080
+    networks:
+      default:
+        ipv4_address: 172.18.0.5
+
+  imprinter:
+    build: ../imprinter
+    image: uniquid/dev-imprinter
+    env_file: .env
+    ports:
+      - 8090:8090
+    networks:
+      default:
+        ipv4_address: 172.18.0.6
+    links:
+      - mqtt
+      - registry
+
+  legatus:
+    build: ../legatus
+    image: uniquid/dev-legatus
+    ports:
+      - 3000:3000
+    networks:
+      default:
+        ipv4_address: 172.18.0.7
+
+  dashboard:
+    build: ../dashboard
+    image: uniquid/dev-dashboard
+    env_file: .env
+    ports:
+      - 8081:8081
+    networks:
+      default:
+        ipv4_address: 172.18.0.8
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16

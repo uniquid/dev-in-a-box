@@ -1,0 +1,60 @@
+
+/**
+ @mainpage
+
+ The __uidcore-c__ offers the primitives needed to build an Entity of the UniquID framework
+ in plain __C__ language.
+
+ look at here for the
+ <a href="https://github.com/uniquid/developer-wiki/blob/master/Documents/architecture.md"> __framework architecture__ </a>
+ details\n
+ see also the @ref README.md "README.md" for implementation details
+
+ ## Library interface ##
+
+ __Main functions__
+ - UID_getLocalIdentity()
+ - UID_getTpub()
+ - UID_getContracts()
+
+ __Provider side message functions__
+ - UID_accept_channel()
+ - UID_parseReqMsg()
+ - UID_checkPermission()
+ - UID_performRequest()
+ - UID_formatRespMsg()
+ - UID_closeServerChannel()
+
+ __User side message functions__
+ - UID_createChannel()
+ - UID_formatReqMsg()
+ - UID_parseRespMsg()
+ - UID_closeChannel()
+
+ __Secondary functions__
+ - UID_signAt()
+ - UID_getPubkeyAt()
+ - UID_getAddressAt()
+ - cryptoMessageSign()
+ - cryptoMessageVerify()
+
+\n
+ ## RPC message structure:##
+
+ __request__\n
+ {"sender":"sender-address", "body":{"method":n, "params":"param-string", "id":nonce} }
+
+ __response__\n
+ {"sender":"sender-address", "body":{"result":"res-string", "error":err, "id":nonce} }
+
+\n
+ ## Code examples ##
+
+ - @ref example_init.c     "entity initialization"
+ - @ref example_provider.c "provider message loop"
+ - @ref example_user.c     "user RPC request"
+
+ @example example_init.c     Code example for the entity initialization
+ @example example_provider.c Code example for the entity provider
+ @example example_user.c     Code example for the entity user
+*/

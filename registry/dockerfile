@@ -1,0 +1,8 @@
+FROM openjdk
+
+COPY registry-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar .
+COPY config.properties .
+
+EXPOSE 8080
+
+ENTRYPOINT java -jar registry-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar config.properties

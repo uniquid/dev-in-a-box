@@ -1,0 +1,90 @@
+#!/bin/bash
+ACTION=$1
+function usage {
+  echo "Usage: $0 {clean|purge|build|log|start|stop|kill}"
+  echo ""
+  echo "Script for managing Uniquid dev-in-a-box"
+  echo "purge: kills and removes all Uniquid's containers, images and networks"
+  echo "clean {imprinter|registry}: cleanup of Uniquid service's state"
+  echo "build: builds Uniquid's images"
+  echo "start: starts Uniquid system"
+  echo "stop: stops Uniquid system"
+  echo "kill: kills Uniquid system"
+  echo "log: logs from Uniquid system"
+  exit 1
+}
+function for_each_uniquid_container {
+  docker ps -a --format "{{.Names}}:{{.Image}}" | while read PS_LINE; do
+    IFS=':' read -a PS_PARTS <<< "$PS_LINE"
+    IMAGE_NAME=${PS_PARTS[1]}
+    if [[ $IMAGE_NAME == uniquid\/* ]]
+      then
+        CONTAINER_NAME=${PS_PARTS[0]}
+        $@ $CONTAINER_NAME
+    fi
+  done
+}
+
+function purge {
+  kill
+  for_each_uniquid_container docker rm
+
+  docker images --format "{{.Repository}}" | grep uniquid\/ | while read IMAGE_NAME; do
+    docker rmi $IMAGE_NAME
+  done
+
+  docker network ls --format "{{.Name}}" | grep uniquid_ | while read NETWORK_NAME; do
+    docker network rm $NETWORK_NAME
+  done
+}
+
+function clean {
+  SERVICE=$1
+  case $SERVICE in
+    imprinter|registry)
+      echo "removing data for $SERVICE"
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-wal
+      docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-shm
+      docker-compose restart $SERVICE
+      ;;
+    *)
+    echo "WW $SERVICE"
+     usage
+     ;;
+  esac
+}
+
+function stop {
+  docker-compose stop
+  for_each_uniquid_container docker stop
+}
+
+function kill {
+  docker-compose kill
+  for_each_uniquid_container docker kill
+}
+
+function start {
+  docker-compose up -d
+}
+
+function log {
+  docker-compose logs -f --tail=20
+}
+
+function build {
+  docker build -t uniquid/dev-tank-c ../tank-c
+  docker build -t uniquid/dev-tank-java ../tank-java
+  docker-compose build
+}
+
+
+case $ACTION in
+  clean|purge|build|log|start|stop|kill)
+    $ACTION $2
+    ;;
+  *)
+   usage
+   ;;
+esac
