@@ -1,5 +1,5 @@
-UNIQUID  Dev-in-a-box [0.0.1]
-====================
+UNIQUID  Dev-in-a-box
+=====================
 Description
 ------------
 
