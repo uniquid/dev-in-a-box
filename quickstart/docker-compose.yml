@@ -4,6 +4,8 @@ services:
   mqtt:
     build: ../mqtt
     image: uniquid/dev-mqtt
+    volumes:
+      - ${MQTT_CONFIG}:/mosquitto/config/mosquitto.conf
     ports:
       - 1883:1883
       - 1884:1884
@@ -14,6 +16,8 @@ services:
   registry:
     build: ../registry
     image: uniquid/dev-registry
+    volumes:
+      - ${REGISTRY_CONFIG}:/config.properties
     ports:
       - 8080:8080
     networks:
@@ -23,6 +27,8 @@ services:
   imprinter:
     build: ../imprinter
     image: uniquid/dev-imprinter
+    volumes:
+      - ${IMPRINTER_CONFIG}:/config.properties
     env_file: .env
     ports:
       - 8090:8090
@@ -45,6 +51,8 @@ services:
   dashboard:
     build: ../dashboard
     image: uniquid/dev-dashboard
+    volumes:
+      - ${DASHBOARD_CONFIG}:/html/conf.json
     env_file: .env
     ports:
       - 8081:8081

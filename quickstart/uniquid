@@ -49,7 +49,6 @@ function clean {
       docker-compose restart $SERVICE
       ;;
     *)
-    echo "WW $SERVICE"
      usage
      ;;
   esac
