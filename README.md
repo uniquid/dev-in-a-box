@@ -111,3 +111,5 @@ stop: stops Uniquid system
 kill: kills Uniquid system
 log: logs from Uniquid system
 ```
+### Module configurations
+`quickstart/.env` file defines a set of env variables specifying wich configuration files are injected into modules on containers' startup.
