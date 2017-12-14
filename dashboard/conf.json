@@ -26,7 +26,17 @@
     "bcAPI": "http://52.167.211.151:3001/insight-api",
     "registryURL": "http://127.0.0.1:8080/registry",
     "imprinterApiUrl": "http://127.0.0.1:8090/api/v1/",
+    "legatusUrl": "http://127.0.0.1:3000/",
     "tabacchiApiUrl": "http://52.225.217.168:8000/",
-    "legatusUrl": "http://127.0.0.1:3000"
+    "initialNodes": [{
+      "isImprinter": true,
+      "endpoint":{
+        "ip": "127.0.0.1",
+        "protocol": "http",
+        "port": "8090"
+      },
+      "name": "default-imprinter-node",
+      "xpub": "default-imprinter-node"
+    }]
   }
 }
