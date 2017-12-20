@@ -71,7 +71,7 @@ When system is up components are exposed to the host machine on the respective p
 | Imprinter        | 8090 - HTTP Services      |                  |
 | Registry         | 8080 - HTTP Services      |                  |
 | Legatus          | 3000 - WebSocket Services |                  |
-| MQTT - Mosquitto | 1833 - TCP                | 1844 - WebSocket |
+| MQTT - Mosquitto | 1883 - TCP                | 1884 - WebSocket |
 | Dashboard        | 8081 - Web Client         |                  |
 
 ### Imprinter
