@@ -12,6 +12,6 @@ WORKDIR /tank-c
 RUN make
 
 WORKDIR /tank-c/bin
-COPY tank-c.ini .
+# COPY tank-c.ini .
 
 ENTRYPOINT ./tank-c

@@ -1,4 +1,6 @@
 #!/bin/bash
+. ./.env
+
 TYPE=$1
 ACTION=$2
 FROM=$3
@@ -40,10 +42,18 @@ for INDEX in $(seq $FROM $TO); do
   CONTAINER_NAME=tank-$TYPE-$INDEX
 
   EXISTING_CONTAINER_ID=$(docker ps -q -a -f name="$CONTAINER_NAME")
+  if [ $TYPE == "java" ]
+    then
+      CONFIG_SRC=$JAVA_TANK_CONFIG
+      CONFIG_DEST=/config.properties
+    else
+      CONFIG_SRC=$C_TANK_CONFIG
+      CONFIG_DEST=/tank-c/bin/tank-c.ini
+  fi
 
   if [ -z $EXISTING_CONTAINER_ID ] && [ $ACTION = start ]
     then
-      docker run -tdi --network uniquid_default --name=$CONTAINER_NAME uniquid/dev-tank-$TYPE
+      docker run -tdi --network uniquid_default -v $(pwd)/$CONFIG_SRC:$CONFIG_DEST --name=$CONTAINER_NAME uniquid/dev-tank-$TYPE
     else
       docker $ACTION $CONTAINER_NAME
   fi
