@@ -62,6 +62,23 @@ When the system is up you may want to start some [Java tank simulator](https://g
 ./tank java rm 2 6
 ```
 
+Tank Manager 
+------------
+The dev-in-a-box provide a mobile application to manage the tanks provided as example.
+This application called  **Tank Manager** enable you  manage the basic tank's operation
+
+Tank manger system requirment:
+
+* Android 6.0 or higher
+
+
+How install :
+* Download the [package](tank-manager/TankManager.apk)
+* Connect the device to you computer
+* Copy the APK on your device and launch  
+
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank 
+
 Check System Components
 -----------------------
 When system is up components are exposed to the host machine on the respective published ports:
