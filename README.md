@@ -77,7 +77,6 @@ How install :
 * Connect the device to you computer
 * Copy the APK on your device and launch  
 
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank 
 
 Check System Components
 -----------------------
@@ -108,7 +107,7 @@ Open your browser at `http://localhost:8081/` and start using the [Orchestrator'
 
 ### Blockchain
 The system is currently using our Blockchain network infrastructure.    
-It will likely be embedded in the box in future releases.    
+It will be likely embedded in the box in future releases.    
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
 Manage System
