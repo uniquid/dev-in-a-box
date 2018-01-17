@@ -65,6 +65,8 @@ function kill {
 }
 
 function start {
+  export LOCAL_IP=$1
+  # sed 's/\$LOCAL_IP/'$LOCAL_IP'/g;s/\$LOCAL_IP/'$LOCAL_IP'/g' ../dashboard/conf_tpl.json > ../dashboard/conf.json
   docker-compose up -d
 }
 

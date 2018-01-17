@@ -23,15 +23,16 @@
   },
 
   "config": {
-    "bcAPI": "http://52.167.211.151:3001/insight-api",
-    "registryURL": "http://127.0.0.1:8080/registry",
-    "imprinterApiUrl": "http://127.0.0.1:8090/api/v1/",
-    "legatusUrl": "http://127.0.0.1:3000/",
+    "peers": "52.225.217.168;52.167.211.151;52.225.218.133",
+    "insight": "http://52.167.211.151:3001",
+    "registryURL": "http://$LOCAL_IP:8080/registry",
+    "imprinterApiUrl": "http://$LOCAL_IP:8090/api/v1/",
+    "legatusUrl": "http://$LOCAL_IP:3000/",
     "tabacchiApiUrl": "http://52.225.217.168:8000/",
     "initialNodes": [{
       "isImprinter": true,
       "endpoint":{
-        "ip": "127.0.0.1",
+        "ip": "$LOCAL_IP",
         "protocol": "http",
         "port": "8090"
       },
