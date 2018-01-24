@@ -4,7 +4,7 @@ Description
 ------------
 
 
-UniquID Dev-in-a-box is a containerized environment that allow the developers to start experiments with the UniquID BLAST ecosystem.    
+UniquID Dev-in-a-box is a containerized environment that allow the developers to start experiments with the UniquID BLAST ecosystem.
 This box provide a base set with:
 
 * **[Dashboard]**
@@ -33,12 +33,13 @@ cd dev-in-a-box/quickstart
 
 Start Uniquid System
 ```
-./uniquid start
+./uniquid start $LOCAL_IP
 ```
+where $LOCAL_IP is a local machine ip visible from the Orchestrator App to let it access the containerized infrastructure.
 
 Start Tank examples
 -------------------
-When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.   
+When the system is up you may want to start some [Java tank simulator](https://github.com/uniquid/tank-java) or [C tank simulator](https://github.com/uniquid/tank-c) acting as Uniquid Nodes.
 `tank` script is what you need
 ```
 # usage:
@@ -62,7 +63,7 @@ When the system is up you may want to start some [Java tank simulator](https://g
 ./tank java rm 2 6
 ```
 
-Tank Manager 
+Tank Manager
 ------------
 The dev-in-a-box provide a mobile application to manage the tanks provided as example.
 This application called  **Tank Manager** enable you  manage the basic tank's operation
@@ -75,7 +76,7 @@ Tank manger system requirment:
 How install :
 * Download the [package](tank-manager/TankManager.apk)
 * Connect the device to you computer
-* Copy the APK on your device and launch  
+* Copy the APK on your device and launch
 
 
 Check System Components
@@ -106,23 +107,22 @@ You may want to check MQTT is up using a web client like http://www.hivemq.com/d
 Open your browser at `http://localhost:8081/` and start using the [Orchestrator's Dashboard](https://github.com/uniquid/orchestrator)
 
 ### Blockchain
-The system is currently using our Blockchain network infrastructure.    
-It will be likely embedded in the box in future releases.    
+The system is currently using our Blockchain network infrastructure.
+It will be likely embedded in the box in future releases.
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
 Manage System
 -------------
-In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid services, images and containers   
+In `quickstart` folder you'll find `uniquid` bash script, use it to manage Uniquid services, images and containers  
 A few commands are available in `uniquid` script, as shown in usage help
 ```
-./uniquid
 Usage: ./uniquid {clean|purge|build|log|start|stop|kill}
 
 Script for managing Uniquid dev-in-a-box
+start <LOCAL_IP>: starts Uniquid system, LOCAL_IP argument is the IP of the local machine that is visible by the orchestrator app
 purge: kills and removes all Uniquid's containers, images and networks
-clean {imprinter|registry}: cleanup of Uniquid service's state: Note:service should be up and running
+clean {imprinter|registry}: cleanup of Uniquid service's state
 build: builds Uniquid's images
-start: starts Uniquid system
 stop: stops Uniquid system
 kill: kills Uniquid system
 log: logs from Uniquid system
