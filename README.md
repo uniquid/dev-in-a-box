@@ -62,6 +62,22 @@ When the system is up you may want to start some [Java tank simulator](https://g
 ./tank java rm 2 6
 ```
 
+Tank Manager 
+------------
+The dev-in-a-box provide a mobile application to manage the tanks provided as example.
+This application called  **Tank Manager** enable you  manage the basic tank's operation
+
+Tank manger system requirment:
+
+* Android 6.0 or higher
+
+
+How install :
+* Download the [package](tank-manager/TankManager.apk)
+* Connect the device to you computer
+* Copy the APK on your device and launch  
+
+
 Check System Components
 -----------------------
 When system is up components are exposed to the host machine on the respective published ports:
@@ -91,7 +107,7 @@ Open your browser at `http://localhost:8081/` and start using the [Orchestrator'
 
 ### Blockchain
 The system is currently using our Blockchain network infrastructure.    
-It will likely be embedded in the box in future releases.    
+It will be likely embedded in the box in future releases.    
 You may want to watch bitcoin transactions representing the contracts between nodes at our bitcoin network infrastructure  [bc-insight](http://52.167.211.151:3001/insight)
 
 Manage System
