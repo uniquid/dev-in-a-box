@@ -4,10 +4,10 @@ function usage {
   echo "Usage: $0 {clean|purge|build|log|start|stop|kill}"
   echo ""
   echo "Script for managing Uniquid dev-in-a-box"
+  echo "start <LOCAL_IP>: starts Uniquid system, LOCAL_IP argument is the IP of the local machine that is visible by the orchestrator app"
   echo "purge: kills and removes all Uniquid's containers, images and networks"
   echo "clean {imprinter|registry}: cleanup of Uniquid service's state"
   echo "build: builds Uniquid's images"
-  echo "start: starts Uniquid system"
   echo "stop: stops Uniquid system"
   echo "kill: kills Uniquid system"
   echo "log: logs from Uniquid system"
@@ -65,6 +65,8 @@ function kill {
 }
 
 function start {
+  export LOCAL_IP=$1
+  # sed 's/\$LOCAL_IP/'$LOCAL_IP'/g;s/\$LOCAL_IP/'$LOCAL_IP'/g' ../dashboard/conf_tpl.json > ../dashboard/conf.json
   docker-compose up -d
 }
 
