@@ -4,15 +4,44 @@ function usage {
   echo "Usage: $0 {clean|purge|build|log|start|stop|kill}"
   echo ""
   echo "Script for managing Uniquid dev-in-a-box"
+  echo "status: check services status"
   echo "start <LOCAL_IP>: starts Uniquid system, LOCAL_IP argument is the IP of the local machine that is visible by the orchestrator app"
+  echo "restart: restarts Uniquid system, configured as current start"
+  echo "reset: cleans services and resets imprinter's ID"
   echo "purge: kills and removes all Uniquid's containers, images and networks"
-  echo "clean {imprinter|registry}: cleanup of Uniquid service's state"
+  echo "clean {imprinter|registry|all}: cleanup of Uniquid service's state"
   echo "build: builds Uniquid's images"
   echo "stop: stops Uniquid system"
   echo "kill: kills Uniquid system"
   echo "log: logs from Uniquid system"
   exit 1
 }
+
+function status {
+  SERVICES_NAMES=(uniquid_dashboard_1 uniquid_imprinter_1 uniquid_legatus_1 uniquid_mqtt_1 uniquid_registry_1)
+
+  MISSING=()
+  for SERVICE in ${SERVICES_NAMES[@]}
+  do
+    RESULT=$(docker ps --format "{{.Names}}" --filter name=$SERVICE)
+    if [[ -z $RESULT ]]; then
+      MISSING+=($SERVICE)
+    fi
+  done
+
+  if [[ ${#MISSING[@]} = 0 ]]
+    then
+      echo "UNIQUID BLAST SERVICES OK"
+      exit 0
+    else
+      echo "UNIQUID BLAST SERVICES KO
+
+Following services are not active:
+${MISSING[@]}"
+      exit 1
+  fi
+}
+
 function for_each_uniquid_container {
   docker ps -a --format "{{.Names}}:{{.Image}}" | while read PS_LINE; do
     IFS=':' read -a PS_PARTS <<< "$PS_LINE"
@@ -38,6 +67,15 @@ function purge {
   done
 }
 
+function reset {
+  ID_FILES_TO_REMOVE=(provider.wallet seed.backup user.wallet userchain.spvchain chain.spvchain)
+  for FILE in ${ID_FILES_TO_REMOVE[@]}
+  do
+    docker exec uniquid_imprinter_1 rm $FILE
+  done
+  clean all
+}
+
 function clean {
   SERVICE=$1
   case $SERVICE in
@@ -47,6 +85,11 @@ function clean {
       docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-wal
       docker exec uniquid_${SERVICE}_1 rm -f $SERVICE.db-shm
       docker-compose restart $SERVICE
+      ;;
+    all)
+      echo "removing all data"
+      clean imprinter
+      clean registry
       ;;
     *)
      usage
@@ -62,6 +105,10 @@ function stop {
 function kill {
   docker-compose kill
   for_each_uniquid_container docker kill
+}
+
+function restart {
+  docker-compose restart
 }
 
 function start {
@@ -82,7 +129,7 @@ function build {
 
 
 case $ACTION in
-  clean|purge|build|log|start|stop|kill)
+  clean|purge|build|log|start|stop|kill|status|reset|restart)
     $ACTION $2
     ;;
   *)
