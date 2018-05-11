@@ -3,7 +3,7 @@ ACTION=$1
 export LOCAL_IP=''
 
 function usage {
-  echo "Usage: $0 {clean|purge|build|log|start|stop|kill}"
+  echo "Usage: $0 {clean|purge|build|log|start|stop|kill|status|reset|restart}"
   echo ""
   echo "Script for managing Uniquid dev-in-a-box"
   echo "status: check services status"
