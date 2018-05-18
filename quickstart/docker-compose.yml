@@ -52,8 +52,10 @@ services:
     build: ../dashboard
     image: uniquid/dev-dashboard
     volumes:
-      - ${DASHBOARD_CONFIG}:/html/conf.json
+      - ${DASHBOARD_CONFIG}:/conf_tpl.json
     env_file: .env
+    environment:
+      - LOCAL_IP=$LOCAL_IP
     ports:
       - 8081:8081
     networks:
