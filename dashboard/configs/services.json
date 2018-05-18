@@ -1,0 +1,8 @@
+{
+  "peers": "52.225.217.168;52.167.211.151;52.225.218.133",
+  "insight": "http://52.167.211.151:3001",
+  "broker": "tcp://$LOCAL_IP:1883",
+  "registry": "http://$LOCAL_IP:8080",
+  "imprinter": "http://$LOCAL_IP:8090",
+  "legatus": "http://$LOCAL_IP:3000"
+}
