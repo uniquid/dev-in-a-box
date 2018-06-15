@@ -5,10 +5,17 @@ services:
     build: ../mqtt
     image: uniquid/dev-mqtt
     volumes:
-      - ${MQTT_CONFIG}:/mosquitto/config/mosquitto.conf
+      - ${MQTT_CONFIG_1}:/etc/rabbitmq/rabbitmq.conf
     ports:
       - 1883:1883
       - 1884:1884
+      - 4369:4369
+      - 5671:5671
+      - 5672:5672
+      - 15671:15671
+      - 15672:15672
+      - 25672:25672
+
     networks:
       default:
         ipv4_address: 172.18.0.3
