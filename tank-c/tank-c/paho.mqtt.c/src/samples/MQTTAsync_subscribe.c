@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 IBM Corp.
+ * Copyright (c) 2012, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,15 +14,19 @@
  *    Ian Craggs - initial contribution
  *******************************************************************************/
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "MQTTAsync.h"
 
 #if !defined(WIN32)
 #include <unistd.h>
 #else
 #include <windows.h>
+#endif
+
+#if defined(_WRS_KERNEL)
+#include <OsWrapper.h>
 #endif
 
 #define ADDRESS     "tcp://localhost:1883"
@@ -45,7 +49,8 @@ void connlost(void *context, char *cause)
 	int rc;
 
 	printf("\nConnection lost\n");
-	printf("     cause: %s\n", cause);
+	if (cause)
+		printf("     cause: %s\n", cause);
 
 	printf("Reconnecting\n");
 	conn_opts.keepAliveInterval = 20;
@@ -53,7 +58,7 @@ void connlost(void *context, char *cause)
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
 		printf("Failed to start connect, return code %d\n", rc);
-	    finished = 1;
+		finished = 1;
 	}
 }
 
@@ -110,7 +115,6 @@ void onConnect(void* context, MQTTAsync_successData* response)
 {
 	MQTTAsync client = (MQTTAsync)context;
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	int rc;
 
 	printf("Successful connection\n");
@@ -136,14 +140,12 @@ int main(int argc, char* argv[])
 	MQTTAsync client;
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
 	MQTTAsync_disconnectOptions disc_opts = MQTTAsync_disconnectOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
-	MQTTAsync_token token;
 	int rc;
 	int ch;
 
 	MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
 
-	MQTTAsync_setCallbacks(client, NULL, connlost, msgarrvd, NULL);
+	MQTTAsync_setCallbacks(client, client, connlost, msgarrvd, NULL);
 
 	conn_opts.keepAliveInterval = 20;
 	conn_opts.cleansession = 1;

@@ -13,6 +13,8 @@
 
 #define DEFAULT_MQTT_ADDRESS     "tcp://broker.mqttdashboard.com:1883"
 #define MQTT_QOS 1
+#define MSG_SOURCE_MQTT 0
+#define MSG_SOURCE_BLE 1
 
 extern char mqtt_address[256];
 
@@ -33,6 +35,8 @@ int mqttUserWaitMsg(uint8_t **msg, size_t *len);
 int mqttProviderWaitMsg(uint8_t **msg, size_t *len);
 int mqttUserSendMsg(char *send_topic, char *recv_topic, uint8_t *msg, size_t size);
 int mqttProviderSendMsg(char *send_topic, uint8_t *msg, size_t size);
+void sendProviderMessage(uint8_t *msg, size_t len);
+void ble_send(uint8_t *msg, size_t len);
 
 
 #endif //__MQTT_TRANSPORT_H

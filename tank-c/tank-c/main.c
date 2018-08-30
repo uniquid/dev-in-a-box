@@ -37,6 +37,8 @@
 #include "UID_fillCache.h"
 #include "UID_dispatch.h"
 #include "MQTTClient.h"
+#include "UID_capBAC.h"
+#include "yajl/yajl_tree.h"
 #include "mqtt_transport.h"
 #include "qrencode.h"
 
@@ -45,8 +47,10 @@
 //static char buf[MAX_SIZEOF(pIdentity->keyPair.privateKey, pIdentity->keyPair.publicKey)*2+1];
 #define DEFAULT_INI_FILE "./tank-c.ini"
 #define DEFAULT_ANNOUNCE_TOPIC "UID/announce"
+#define DEFAULT_NAME_PREFIX "UID"
 
 char *pAnnounceTopic = DEFAULT_ANNOUNCE_TOPIC;
+char *pNamePrefix = DEFAULT_NAME_PREFIX;
 
 // Update Cache Thread
 // gets contracts from the BlockChain and updates the local cache
@@ -144,7 +148,7 @@ void *service_user(void *arg)
 
 	char machine[UID_NAME_LENGHT] = {0};
 	int method ;
-	char param[50] = {0};
+	char param[250] = {0};
 
     DBG_Print("Address %s ClientIID %s\n\n", mqtt_address, "myname");
 
@@ -155,7 +159,7 @@ void *service_user(void *arg)
 		DBG_Print("\n\n------------ enter request (es. UID984fee057c6d 33 {\"hello\":\"world\"} -----------------\n\n");
 		#define _STR(a) #a
 		#define STR(a) _STR(a)
-		if (3 != scanf("%" STR(UID_NAME_LENGHT) "s %d %50s", machine, &method, param)) continue;
+		if (3 != scanf("%" STR(UID_NAME_LENGHT) "s %d %" STR(sizeof(param)) "s", machine, &method, param)) continue;
 
 		// client
 		UID_ClientChannelCtx ctx;
@@ -266,6 +270,76 @@ int MY_perform_request(uint8_t *buffer, size_t size, uint8_t *response, size_t *
     return UID_MSG_OK;
 }
 
+/**
+ * Check the message for capability
+ */
+int decodeCapability(uint8_t *msg)
+{
+	UID_UniquidCapability cap = {0};
+	yajl_val node, v;
+	int ret = 0;
+
+	const char * assigner[] = { "assigner", (const char *) 0 };
+	const char * resourceID[] = { "resourceID", (const char *) 0 };
+	const char * assignee[] = { "assignee", (const char *) 0 };
+	const char * rights[] = { "rights", (const char *) 0 };
+	const char * since[] = { "since", (const char *) 0 };
+	const char * until[] = { "until", (const char *) 0 };
+	const char * assignerSignature[] = { "assignerSignature", (const char *) 0 };
+
+    // parse message
+	node = yajl_tree_parse((char *)msg, NULL, 0);
+    if (node == NULL) return 0; // parse error. not a capability
+
+    v = yajl_tree_get(node, assigner, yajl_t_string);
+    if (v == NULL) goto clean_return;
+    if (sizeof(cap.assigner) <= (size_t)snprintf(cap.assigner, sizeof(cap.assigner), "%s", YAJL_GET_STRING(v)))
+		goto clean_return;
+
+    v = yajl_tree_get(node, resourceID, yajl_t_string);
+    if (v == NULL) goto clean_return;
+    if (sizeof(cap.resourceID) <= (size_t)snprintf(cap.resourceID, sizeof(cap.resourceID), "%s", YAJL_GET_STRING(v)))
+		goto clean_return;
+
+    v = yajl_tree_get(node, assignee, yajl_t_string);
+    if (v == NULL) goto clean_return;
+    if (sizeof(cap.assignee) <= (size_t)snprintf(cap.assignee, sizeof(cap.assignee), "%s", YAJL_GET_STRING(v)))
+		goto clean_return;
+
+    v = yajl_tree_get(node, rights, yajl_t_string);
+    if (v == NULL) goto clean_return;
+	if (sizeof(cap.rights) != fromhex(YAJL_GET_STRING(v), (uint8_t *)&(cap.rights), sizeof(cap.rights)))
+		goto clean_return;
+
+    v = yajl_tree_get(node, since, yajl_t_number);
+    if (v == NULL) goto clean_return;
+	cap.since = YAJL_GET_INTEGER(v);
+
+    v = yajl_tree_get(node, until, yajl_t_number);
+    if (v == NULL) goto clean_return;
+	cap.until = YAJL_GET_INTEGER(v);
+
+    v = yajl_tree_get(node, assignerSignature, yajl_t_string);
+    if (v == NULL) goto clean_return;
+    if (sizeof(cap.assignerSignature) <= (size_t)snprintf(cap.assignerSignature, sizeof(cap.assignerSignature), "%s", YAJL_GET_STRING(v)))
+		goto clean_return;
+
+	// parsing OK. Will return 1
+    ret = 1;
+
+	// receive the capability
+	int recv = UID_receiveProviderCapability(&cap);
+	if (recv != UID_CAPBAC_OK) {
+		DBG_Print("ERROR receiving capability: UID_receiveProviderCapability() returns %d\n", recv);
+	}
+	else {
+		DBG_Print("Valid capability received!!\n");
+	}
+
+clean_return:
+    if (NULL != node) yajl_tree_free(node);
+    return ret;
+}
 
 /**
  * thread implementing a Service Provider
@@ -280,6 +354,11 @@ void* service_provider(void *arg)
 		uint8_t *msg;
 		size_t size;
 		mqttProviderWaitMsg(&msg, &size);
+		if(decodeCapability(msg)) {
+			// got capability
+			free(msg);
+			continue;
+		}
 		// server
 		UID_ServerChannelCtx sctx;
 		uint8_t sbuffer[1024];
@@ -316,6 +395,7 @@ static char lbuffer[1024];
 static char applianceUrl[256]= {0};
 static char registryUrl[256]= {0};
 static char announceTopic[256] = {0};
+static char namePrefix[UID_NAME_LENGHT - 12 - 1] = {0};
 
 /**
  * loads configuration parameters from ini_file - ./tank-c.ini
@@ -324,6 +404,7 @@ static char announceTopic[256] = {0};
  *
  * debug level: 7
  * fake MAC: 1
+ * name_prefix: UID
  * mqtt_address: tcp://10.0.0.4:1883
  * announce_topic: UID/announce
  * UID_appliance: http://appliance3.uniquid.co:8080/insight-api
@@ -352,6 +433,9 @@ void loadConfiguration(char *ini_file)
 
 			snprintf(format, sizeof(format),  "announce_topic: %%%zus\n", sizeof(announceTopic) - 1);
 			if (1 == sscanf(lbuffer, format,  announceTopic)) pAnnounceTopic = announceTopic;
+
+			snprintf(format, sizeof(format),  "name_prefix: %%%zus\n", sizeof(namePrefix) - 1);
+			if (1 == sscanf(lbuffer, format,  namePrefix)) pNamePrefix = namePrefix;
 
 #pragma GCC diagnostic pop
 
@@ -450,7 +534,7 @@ int main( int argc, char **argv )
 	DBG_Print("tpub: %s\n", UID_getTpub());
 
 	uint8_t *mac = getMacAddress(fake);
-	snprintf(myname, sizeof(myname), "UID%02x%02x%02x%02x%02x%02x",mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	snprintf(myname, sizeof(myname), "%s%02x%02x%02x%02x%02x%02x",pNamePrefix, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	DBG_Print("Uniqe name %s\n", myname);
 
 	signal(SIGCHLD, SIG_IGN);  // prevents the child process to become zombies

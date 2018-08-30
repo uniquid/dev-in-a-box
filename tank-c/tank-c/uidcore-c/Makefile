@@ -22,14 +22,16 @@ CFLAGS   += $(OPTFLAGS) \
             -Winit-self \
             -Wuninitialized \
             -Wformat-security \
-            -Werror
+            -Werror \
+-Wno-missing-field-initializers \
+-Wno-missing-braces
 
 CFLAGS += -Iyajl/build/yajl-2.1.1/include -Itrezor-crypto
 LIB-YAJL := yajl/build/yajl-2.1.1/lib/libyajl_s.a
 LIB-TREZOR := trezor-crypto/libtrezor-crypto.so
 
 SRCS	:= $(shell find -maxdepth 1 -name "UID_*.c")
-SRCS  += 
+SRCS  += base64.c
 LIBS	+= -L $(dir $(LIB-YAJL)) -l $(patsubst lib%,%, $(basename $(notdir $(LIB-YAJL))))
 LIBS	+= -L $(dir $(LIB-TREZOR)) -l $(patsubst lib%,%, $(basename $(notdir $(LIB-TREZOR))))
 
@@ -47,14 +49,14 @@ $(LIB-YAJL): yajl/build/Makefile
 	make -C yajl/build
 
 $(LIB-TREZOR):
-	make -C trezor-crypto
+	make -C trezor-crypto libtrezor-crypto.so
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 
 libuidcore-c.so: $(SRCS) $(HEADERS) Makefile $(LIB-YAJL) $(LIB-TREZOR)
-	$(CC) $(CFLAGS) -fPIC -shared $(SRCS) $(LIBS) -o libuidcore-c.so
+	$(CC) $(CFLAGS) -fPIC -shared $(SRCS) -Wl,-rpath='$$ORIGIN' $(LIBS) -o libuidcore-c.so
 
 tests: tests.c libuidcore-c.so
 	$(CC) $(CFLAGS) tests.c $(SRCS) $(LIBS) -Wl,-rpath=$(dir $(LIB-TREZOR)) -lcurl -lcunit -ftest-coverage -fprofile-arcs -o tests

@@ -1,8 +1,0 @@
-FROM nginx:latest
-RUN ["mkdir", "/html"]
-COPY ["./start.sh", "."]
-COPY ["./dashboard.conf", "/etc/nginx/conf.d/default.conf"]
-COPY ["./build", "/html"]
-COPY ["./configs", "/html/configs"]
-ENTRYPOINT ./start.sh
-EXPOSE 8081

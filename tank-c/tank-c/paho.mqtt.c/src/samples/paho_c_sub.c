@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 IBM Corp.
+ * Copyright (c) 2012, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *   http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
@@ -17,15 +17,15 @@
  *******************************************************************************/
 
 /*
- 
+
  stdout subscriber for the asynchronous client
- 
+
  compulsory parameters:
- 
+
   --topic topic to subscribe to
- 
+
  defaulted parameters:
- 
+
 	--host localhost
 	--port 1883
 	--qos 2
@@ -33,10 +33,10 @@
 	--clientid stdout-subscriber-async
 	--showtopics off
 	--keepalive 10
-	
+
 	--userid none
 	--password none
- 
+
 */
 
 #include "MQTTAsync.h"
@@ -44,7 +44,8 @@
 
 #include <stdio.h>
 #include <signal.h>
-#include <memory.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 #if defined(WIN32)
@@ -52,10 +53,12 @@
 #define sleep Sleep
 #else
 #include <sys/time.h>
-#include <stdlib.h>
 #include <unistd.h>
 #endif
 
+#if defined(_WRS_KERNEL)
+#include <OsWrapper.h>
+#endif
 
 volatile int finished = 0;
 char* topic = NULL;
@@ -108,7 +111,7 @@ void usage(void)
 void getopts(int argc, char** argv)
 {
 	int count = 2;
-	
+
 	while (count < argc)
 	{
 		if (strcmp(argv[count], "--qos") == 0)
@@ -198,7 +201,7 @@ void getopts(int argc, char** argv)
 		}
 		count++;
 	}
-	
+
 }
 
 
@@ -238,7 +241,7 @@ void onSubscribeFailure(void* context, MQTTAsync_failureData* response)
 
 void onConnectFailure(void* context, MQTTAsync_failureData* response)
 {
-	printf("Connect failed, rc %d\n", response->code);
+	printf("Connect failed, rc %d\n", response ? response->code : -99);
 	finished = 1;
 }
 
@@ -247,7 +250,6 @@ void onConnect(void* context, MQTTAsync_successData* response)
 {
 	MQTTAsync client = (MQTTAsync)context;
 	MQTTAsync_responseOptions ropts = MQTTAsync_responseOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
 	int rc;
 
 	if (opts.showtopics)
@@ -287,10 +289,10 @@ int main(int argc, char** argv)
 	MQTTAsync_disconnectOptions disc_opts = MQTTAsync_disconnectOptions_initializer;
 	int rc = 0;
 	char url[100];
-	
+
 	if (argc < 2)
 		usage();
-	
+
 	topic = argv[1];
 
 	if (strchr(topic, '#') || strchr(topic, '+'))
@@ -298,7 +300,7 @@ int main(int argc, char** argv)
 	if (opts.showtopics)
 		printf("topic is %s\n", topic);
 
-	getopts(argc, argv);	
+	getopts(argc, argv);
 	sprintf(url, "%s:%s", opts.host, opts.port);
 
 	rc = MQTTAsync_create(&client, url, opts.clientid, MQTTCLIENT_PERSISTENCE_NONE, NULL);
@@ -357,5 +359,3 @@ exit:
 
 	return EXIT_SUCCESS;
 }
-
-

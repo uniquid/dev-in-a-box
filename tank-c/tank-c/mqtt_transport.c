@@ -32,6 +32,7 @@ typedef struct {
 } SyncObject;
 
 char mqtt_address[256] = DEFAULT_MQTT_ADDRESS;
+int mqtt_connected = 0;
 
 //mqtt channel staus variables
 static MQTTClient client = NULL;
@@ -45,10 +46,30 @@ static char *ClientTopic = NULL;
 static SyncObject prvdRcvSync = SYNCOBJECT_INITIALIZER;
 static uint8_t   *prvdRcvMsg = NULL; //provider receive buffer
 static size_t     prvdRcvLen = 0;
+static int        source = MSG_SOURCE_MQTT; // source of the message
 // User
 static SyncObject usrRcvSync = SYNCOBJECT_INITIALIZER;
 static uint8_t   *usrRcvMsg = NULL; //provider receive buffer
 static size_t     usrRcvLen = 0;
+
+void sendProviderMessage(uint8_t *msg, size_t len)
+{
+        // message for the provider
+        pthread_mutex_lock(&(prvdRcvSync.mtx));
+        if (prvdRcvSync.val) {
+            // previous message still queued.
+            // lets remove it
+            free(prvdRcvMsg);
+        }
+        source = MSG_SOURCE_BLE;
+        prvdRcvLen = len+1;
+        prvdRcvMsg = msg;
+        prvdRcvMsg[len] = 0;
+        prvdRcvSync.val = 1;
+        pthread_cond_signal(&(prvdRcvSync.var));
+        pthread_mutex_unlock(&(prvdRcvSync.mtx));
+        return ;
+}
 
 /**
  * callback called from the MQTT library when a message arrives
@@ -65,6 +86,7 @@ static int msgarrvd(void *context_, char *topicName, int topicLen, MQTTClient_me
             // lets remove it
             free(prvdRcvMsg);
         }
+        source = MSG_SOURCE_MQTT;
         prvdRcvLen = message->payloadlen+1;
         prvdRcvMsg = malloc(prvdRcvLen);
         memcpy(prvdRcvMsg, message->payload, message->payloadlen);
@@ -116,25 +138,21 @@ int mqttUserWaitMsg(uint8_t **msg, size_t *len)
 
 int mqttProviderWaitMsg(uint8_t **msg, size_t *len)
 {
+    int s;
     pthread_mutex_lock(&(prvdRcvSync.mtx));
     while(0 == prvdRcvSync.val) // wait for a message
         pthread_cond_wait(&(prvdRcvSync.var), &(prvdRcvSync.mtx));
 
     *msg = prvdRcvMsg;
     *len = prvdRcvLen;
+    s = source;
     prvdRcvSync.val = 0;
     pthread_mutex_unlock(&(prvdRcvSync.mtx));
-    return 0;
+    return s;
 }
 
 
-static void connlost(void *context, char *cause)
-{
-(void)context;
-    DBG_Print("\nConnection lost\n");
-    DBG_Print("     cause: %s\n", cause);
-    exit(-1);
-}
+static void connlost(void *context, char *cause);
 
 
 static void mqttConnect(void)
@@ -159,10 +177,19 @@ static void mqttConnect(void)
     // Try to connect 
     conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
-    if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
+    for(;;)
     {
-        DBG_Print("Failed to connect, return code %d\n", rc);
-        exit(-1);
+        if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
+        {
+            DBG_Print("mqtt Failed to connect, return code %d\n", rc);
+            sleep(30);
+        }
+        else
+        {
+            mqtt_connected = 1;
+            DBG_Print("mqtt broker Connected!!\n");
+            break;
+        }
     }
 
     MQTTClient_unsubscribe(client, "#");
@@ -180,6 +207,7 @@ static void mqttConnect(void)
 // send buffers and synchronization variables
 #define PROVIDER_BUFFER_HAS_DATA 1
 #define USER_BUFFER_HAS_DATA 2
+#define CONNECTION_LOST 4
 static SyncObject sync_msg = SYNCOBJECT_INITIALIZER;
 // User
 static uint8_t *usrSndMsg = NULL; //user buffer
@@ -241,6 +269,19 @@ int mqttProviderSendMsg(char *send_topic, uint8_t *msg, size_t size)
    return 0;
 }
 
+static void connlost(void *context, char *cause)
+{
+(void)context;
+    mqtt_connected = 0;
+    DBG_Print("\nmqtt Connection lost\n");
+    DBG_Print("     cause: %s\n", cause);
+    sleep(30);
+    //mqttConnect();
+    pthread_mutex_lock(&(sync_msg.mtx));
+    sync_msg.val |= CONNECTION_LOST;
+    pthread_cond_signal(&(sync_msg.var));
+    pthread_mutex_unlock(&(sync_msg.mtx));
+}
 
 /**
  * mqtt worker.
@@ -286,6 +327,13 @@ void *mqttWorker(void *ctx)
             prvdSndMsg = NULL;
             prvdSndLen = 0;
             sync_msg.val ^= PROVIDER_BUFFER_HAS_DATA;
+        }
+        if (sync_msg.val & CONNECTION_LOST) {
+            // Connection lost
+
+            mqttConnect();
+
+            sync_msg.val ^= CONNECTION_LOST;
         }
         pthread_cond_wait(&(sync_msg.var), &(sync_msg.mtx));
     }

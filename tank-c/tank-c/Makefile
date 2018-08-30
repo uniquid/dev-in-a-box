@@ -11,6 +11,7 @@ EXTRA_LIBS		+= -L./uidcore-c -luidcore-c
 EXTRA_LIBS		+= -L./paho.mqtt.c/build/output/ -lpaho-mqtt3c
 
 
+unexport CFLAGS
 CFLAGS :=
 CFLAGS   += -W \
             -Wall \
@@ -29,10 +30,13 @@ CFLAGS   += -W \
             -Winit-self \
             -Wuninitialized \
             -Wformat-security \
-            -Werror
+            -Werror \
+	    -Wno-missing-field-initializers \
+            -Wno-missing-braces
 
 EXTRA_CFLAGS	+= -I./uidcore-c -I./paho.mqtt.c/src/ -std=gnu99 -D DEBUG
 EXTRA_CFLAGS	+= -I./libqrencode
+EXTRA_CFLAGS	+= -I./uidcore-c/yajl/build/yajl-2.1.1/include
 
 OBJS := helpers.o main.o mqtt_transport.o tank.o
 OBJS += bitstream.o mask.o mmask.o mqrspec.o qrencode.o qrinput.o qrspec.o rscode.o split.o
@@ -42,9 +46,9 @@ OBJS := $(addprefix $(OBJDIR)/,$(OBJS))
 all: $(EXEDIR)/$(EXEFILE)
 
 # build the target
-$(EXEDIR)/$(EXEFILE): $(OBJS) uidcore-c/libuidcore-c.so paho.mqtt.c/build/output/libpaho-mqtt3c.so.1
+$(EXEDIR)/$(EXEFILE): uidcore-c/libuidcore-c.so paho.mqtt.c/build/output/libpaho-mqtt3c.so.1 $(OBJS)
 	@mkdir -p $(EXEDIR)
-	$(CC) -o $@ $(OBJS) $(LIBS) $(EXTRA_LIBS)
+	$(CC) -o $@ $(OBJS) $(EXTRA_LIBS) $(LIBS)
 	cp tank-c.ini $(EXEDIR)
 	# copy the libraries
 	@cp uidcore-c/libuidcore-c.so $(EXEDIR)
@@ -57,7 +61,7 @@ uidcore-c/libuidcore-c.so:
 
 # build paho.mqtt.c library
 paho.mqtt.c/build/output/libpaho-mqtt3c.so.1:
-	make -C paho.mqtt.c
+	make -C paho.mqtt.c mkdir build/output/libpaho-mqtt3c.so.1.0
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p $(OBJDIR)

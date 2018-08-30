@@ -13,9 +13,14 @@ It requires:
 * uidcore-c
 * libpaho-mqtt
 
+These packages should be enaugh to compile on a fresh installed Ubuntu 17.10<br>
+build-essential<br>
+cmake<br>
+libcurl4-openssl-dev<br>
+
 ## download
 clone with --recurse-submodules:<br>
-git clone --recurse-submodules git@github.com:uniquid/tank-c.git<br>
+git clone --recurse-submodules git@github.com:uniquid/tank-c.git -b simplified-node<br>
 cd tank-c
 ## build the project:
 make
@@ -27,7 +32,7 @@ cd bin<br>
 **provider**
 
 **tank-c** implements a Uniquid node with provider and user capabilities.
-As a provider it simulates a tank with a plc controller, an input faucet and an output faucet.
+This is a simplified version of the tank-c used for the stress test of the infrastructure.
 As user it can send rpc requests to another Uniquid node.
 
 The provider, in addition to the systems reserved, implements the following RPC functions:<br>
@@ -36,12 +41,9 @@ The provider, in addition to the systems reserved, implements the following RPC 
 &nbsp;&nbsp;&nbsp;&nbsp;parameters:
 - "string to be echoed" -
 
-**RPC 34** - machine controller<br>
+**RPC 34** - returns status information<br>
 &nbsp;&nbsp;&nbsp;&nbsp;parameters:
-- "open" - power on the controller
-- "close" - power down the controller
-
-when the controller is opened the tank outputs its status to a dashboard. The dasboard can be found at [https://github.com/uniquid/Crouton]
+- "" - none
 
 **RPC 35** - input faucet<br>
 &nbsp;&nbsp;&nbsp;&nbsp;parameters:

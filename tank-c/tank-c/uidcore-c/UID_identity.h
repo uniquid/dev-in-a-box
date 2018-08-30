@@ -32,7 +32,8 @@ typedef struct
 void UID_getLocalIdentity(char *keypriv_h);
 int UID_getPubkeyAt(UID_Bip32Path *path, uint8_t public_key[33]);
 int UID_getAddressAt(UID_Bip32Path *path, char *b58addr, size_t size);
-int UID_signAt(UID_Bip32Path *path, uint8_t hash[32], uint8_t sig[64]);
+int UID_signAt(UID_Bip32Path *path, uint8_t hash[32], uint8_t sig[64], uint8_t *pby);
+char *UID_tprvFromSeed(uint8_t seed[32], char *tprv, int tprvsize);
 char *UID_getTpub(void);
 
 #endif

@@ -18,7 +18,7 @@
 #include "sha2.h"
 #include "yajl/yajl_tree.h"
 #include "UID_transaction.h"
-#include "UID_bchainBTC.h"
+#include "UID_fillCache.h"
 #include "UID_utils.h"
 #include "UID_identity.h"
 #include "ecdsa.h"
@@ -226,7 +226,7 @@ int UID_buildScriptSig(uint8_t *rawtx, size_t rawtx_len, UID_Bip32Path *path, in
         ecdsa_get_pubkeyhash(public_key, pubkeyhash);
         res = UID_digestRawTx(rawtx, rawtx_len, i, pubkeyhash, hash);
         if (UID_TX_OK != res) return res;
-        UID_signAt(&path[i], hash, sig);  // ecdsa_sign_digest(&secp256k1, private_key, hash, sig, &pby);
+        UID_signAt(&path[i], hash, sig, NULL);  // ecdsa_sign_digest(&secp256k1, private_key, hash, sig, &pby);
 
         len_der = ecdsa_sig_to_der(sig, scriptsig[i]+2); // OP_PUSH(len of DER) || DER
         scriptsig[i][0] = 1 + len_der + 1 + 1 + 33;      // len script: OP_PUSH(len of DER) DER hash-type OP_PUSH(len of pubkey) pubkey
@@ -317,7 +317,7 @@ void UID_signAndSendContract(char *param, char *result, size_t size)
     UID_buildSignedHex(rawtx, rawtx_len, scriptsig, transaction, sizeof(jsontransaction)-TX_OFFSET);
     strcpy(result, "6 - ");
     res = UID_sendTx(jsontransaction, result + 4, size - 4);
-    if (0 == res) {
+    if (UID_HTTP_OK == res) {
         yajl_tree_free(jnode);
         jnode = yajl_tree_parse(result + 4, errbuf, sizeof(errbuf));
         if ( NULL != jnode) {

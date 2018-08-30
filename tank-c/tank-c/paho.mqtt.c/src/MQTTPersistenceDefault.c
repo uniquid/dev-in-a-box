@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corp.
+ * Copyright (c) 2009, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,6 +14,7 @@
  *    Ian Craggs - initial API and implementation and/or initial documentation
  *    Ian Craggs - async client updates
  *    Ian Craggs - fix for bug 484496
+ *    Ian Craggs - fix for issue 285
  *******************************************************************************/
 
 /**
@@ -28,6 +29,8 @@
  */
 
 #if !defined(NO_PERSISTENCE)
+
+#include "OsWrapper.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -53,7 +56,6 @@
 #include "MQTTPersistenceDefault.h"
 #include "StackTrace.h"
 #include "Heap.h"
-
 
 /** Create persistence directory for the client: context/clientID-serverURI.
  *  See ::Persistence_open
@@ -85,30 +87,41 @@ int pstopen(void **handle, const char* clientID, const char* serverURI, void* co
 	/* create clientDir directory */
 
 	/* pCrtDirName - holds the directory name we are currently trying to create.           */
-	/*               This gets built up level by level until the full path name is created.*/
+	/*               This gets built up level by level untipwdl the full path name is created.*/
 	/* pTokDirName - holds the directory name that gets used by strtok.         */
 	pCrtDirName = (char*)malloc( strlen(clientDir) + 1 );
 	pTokDirName = (char*)malloc( strlen(clientDir) + 1 );
 	strcpy( pTokDirName, clientDir );
 
-	pToken = strtok_r( pTokDirName, "\\/", &save_ptr );
+	/* If first character is directory separator, make sure it's in the created directory name #285 */
+	if (*pTokDirName == '/' || *pTokDirName == '\\')
+	{
+		*pCrtDirName = *pTokDirName;
+		pToken = strtok_r( pTokDirName + 1, "\\/", &save_ptr );
+		strcpy( pCrtDirName + 1, pToken );
+	}
+	else
+	{
+		pToken = strtok_r( pTokDirName, "\\/", &save_ptr );
+		strcpy( pCrtDirName, pToken );
+	}
 
-	strcpy( pCrtDirName, pToken );
 	rc = pstmkdir( pCrtDirName );
 	pToken = strtok_r( NULL, "\\/", &save_ptr );
 	while ( (pToken != NULL) && (rc == 0) )
 	{
 		/* Append the next directory level and try to create it */
-		sprintf( pCrtDirName, "%s/%s", pCrtDirName, pToken );
+		strcat( pCrtDirName, "/" );
+		strcat( pCrtDirName, pToken );
 		rc = pstmkdir( pCrtDirName );
 		pToken = strtok_r( NULL, "\\/", &save_ptr );
 	}
 
 	*handle = clientDir;
 
-	free(perserverURI);
 	free(pTokDirName);
 	free(pCrtDirName);
+	free(perserverURI);
 
 	FUNC_EXIT_RC(rc);
 	return rc;
@@ -127,7 +140,11 @@ int pstmkdir( char *pPathname )
 	{
 #else
 	/* Create a directory with read, write and execute access for the owner and read access for the group */
+#if !defined(_WRS_KERNEL)
 	if ( mkdir( pPathname, S_IRWXU | S_IRGRP ) != 0 )
+#else
+	if ( mkdir( pPathname ) != 0 )
+#endif /* !defined(_WRS_KERNEL) */
 	{
 #endif
 		if ( errno != EEXIST )
@@ -718,8 +735,8 @@ int main (int argc, char *argv[])
 	int rc;
 	char *handle;
 	char *perdir = ".";
-	char *clientID = "TheUTClient";
-	char *serverURI = "127.0.0.1:1883";
+	const char *clientID = "TheUTClient";
+	const char *serverURI = "127.0.0.1:1883";
 
 	char *stem = MSTEM;
 	int msgId, i;
@@ -738,7 +755,7 @@ int main (int argc, char *argv[])
 		buflens[i]=strlen(bufs[i]);
 
 	/* open */
-	//printf("Persistence directory : %s\n", perdir);
+	/* printf("Persistence directory : %s\n", perdir); */
 	rc = pstopen((void**)&handle, clientID, serverURI, perdir);
 	printf("%s Persistence directory for client %s : %s\n", RC, clientID, handle);
 

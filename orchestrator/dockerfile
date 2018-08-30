@@ -1,0 +1,8 @@
+FROM openjdk
+
+COPY massive-orchestrator-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar .
+# COPY config.properties .
+
+EXPOSE 9999
+
+ENTRYPOINT java -jar massive-orchestrator-0.1-RC1-SNAPSHOT-jar-with-dependencies.jar config.properties

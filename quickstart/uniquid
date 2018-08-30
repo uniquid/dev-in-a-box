@@ -20,7 +20,7 @@ function usage {
 }
 
 function status {
-  SERVICES_NAMES=(uniquid_dashboard_1 uniquid_imprinter_1 uniquid_legatus_1 uniquid_mqtt_1 uniquid_registry_1)
+  SERVICES_NAMES=(uniquid_orchestrator_1 uniquid_imprinter_1 uniquid_mqtt_1 uniquid_registry_1)
 
   MISSING=()
   for SERVICE in ${SERVICES_NAMES[@]}

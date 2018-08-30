@@ -28,9 +28,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>
 
 #include "Heap.h"
+
+
+static int ListUnlink(List* aList, void* content, int(*callback)(void*, void*), int freeContent);
 
 
 /**
@@ -194,7 +196,7 @@ ListElement* ListFindItem(List* aList, void* content, int(*callback)(void*, void
  * @param freeContent boolean value to indicate whether the item found is to be freed
  * @return 1=item removed, 0=item not removed
  */
-int ListUnlink(List* aList, void* content, int(*callback)(void*, void*), int freeContent)
+static int ListUnlink(List* aList, void* content, int(*callback)(void*, void*), int freeContent)
 {
 	ListElement* next = NULL;
 	ListElement* saved = aList->current;
@@ -216,7 +218,10 @@ int ListUnlink(List* aList, void* content, int(*callback)(void*, void*), int fre
 
 	next = aList->current->next;
 	if (freeContent)
+        {
 		free(aList->current->content);
+                aList->current->content = NULL;
+        }
 	if (saved == aList->current)
 		saveddeleted = 1;
 	free(aList->current);
@@ -355,7 +360,10 @@ void ListEmpty(List* aList)
 	{
 		ListElement* first = aList->first;
 		if (first->content != NULL)
+                {
 			free(first->content);
+                        first->content = NULL;
+                }
 		aList->first = first->next;
 		free(first);
 	}
@@ -471,7 +479,7 @@ int main(int argc, char *argv[])
 	while (ListPrevElement(l, &current) != NULL)
 		printf("List element: %d\n", *((int*)(current->content)));
 
-	//if ListFindItem(l, *ip, intcompare)->content
+	/* if ListFindItem(l, *ip, intcompare)->content */
 
 	printf("List contents having deleted element %d:\n", *todelete);
 	ListRemove(l, todelete);

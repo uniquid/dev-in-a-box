@@ -18,29 +18,29 @@
  */
 
 #include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <curl/curl.h>
-#include "sha2.h"
-#include "UID_utils.h"
-#include "UID_globals.h"
-#include "UID_identity.h"
+#include "UID_httpal.h"
 #include "UID_bchainBTC.h"
 #include "UID_fillCache.h"
-#include "yajl/yajl_parse.h"
+#include "UID_time.h"
+#include "UID_log.h"
 
 /**
  * double buffer for contract cache<br>
  * UID_getContracts may fill seconb while current is read
  */
-cache_buffer cache0 = { { { {0},{0},{0,{0},0,{{0}}} } }, 0, { { {0},{0},{0} } }, 0, PTHREAD_MUTEX_INITIALIZER };
-cache_buffer cache1 = { { { {0},{0},{0,{0},0,{{0}}} } }, 0, { { {0},{0},{0} } }, 0, PTHREAD_MUTEX_INITIALIZER };
+static cache_buffer cache0 = { { { {0},{0},UID_SMARTC_INITIALIZER } }, 0, { { {0},{0},{0} } }, 0, PTHREAD_MUTEX_INITIALIZER };
+static cache_buffer cache1 = { { { {0},{0},UID_SMARTC_INITIALIZER } }, 0, { { {0},{0},{0} } }, 0, PTHREAD_MUTEX_INITIALIZER };
+/**
+ * capability contract cache
+ */
+static cache_buffer capDB  = { { { {0},{0},UID_SMARTC_INITIALIZER } }, UID_CONTRACTS_CACHE_SIZE, { { {0},{0},{0} } }, UID_CLIENT_CACHE_SIZE, PTHREAD_MUTEX_INITIALIZER };
 
 /**
- * pointers to the main and secondary buffer
+ * pointers to the main, secondary and capability buffer
  */
 cache_buffer *current = &cache0;
 cache_buffer *secondb = &cache1;
+cache_buffer *capDBp  = &capDB;
 
 /**
  * Base url of the Insight API appliance
@@ -99,10 +99,11 @@ int  fillDummyCache(void)
  */
 int UID_getContracts(cache_buffer **cache)
 {
-    CURL *curl;
+    UID_HttpOBJ *curl;
     int res;
 
-    curl = curl_easy_init();
+    *cache = current; // set *cahe to current in case of error
+    curl = UID_httpinit();
 
     pthread_mutex_lock(&(secondb->in_use));  // lock the resource
 
@@ -120,7 +121,7 @@ int UID_getContracts(cache_buffer **cache)
     }
 
     /* always cleanup */ 
-    curl_easy_cleanup(curl);
+    UID_httpcleanup(curl);
     
     return res;
 }
@@ -149,6 +150,33 @@ UID_SecurityProfile *UID_matchContract(BTC_Address serviceUserAddress)
         if (strcmp((ptr->contractsCache)[i].serviceUserAddress, serviceUserAddress) == 0)
         {   // found the contract
             //if ((ptr->contractsCache)[i].profile == 0) break; // profile == 0 contract revoked! return NULL
+            memcpy(&goodContract,  (ptr->contractsCache) + i, sizeof(goodContract)); // copy to goodContract
+            ret_val = &goodContract; // return pointer to it
+            break;
+        }
+    }
+
+    pthread_mutex_unlock(&(ptr->in_use));  // unlock the resource
+    if (NULL != ret_val)
+        return ret_val;
+
+    ptr = capDBp;
+    pthread_mutex_lock(&(ptr->in_use));  // lock the resource
+
+    for(i=0; i<(ptr->validCacheEntries); i++)
+    {
+        if (strcmp((ptr->contractsCache)[i].serviceUserAddress, serviceUserAddress) == 0)
+        {   // found the contract
+            //if ((ptr->contractsCache)[i].profile == 0) break; // profile == 0 contract revoked! return NULL
+            int64_t time = UID_getTime();
+            if (time < (ptr->contractsCache)[i].profile.since) {
+                UID_log(UID_LOG_ERROR, "In func <%s> " "Contract not yet valid\n", __func__);
+                continue;
+            }
+            if (time > (ptr->contractsCache)[i].profile.until) {
+                UID_log(UID_LOG_ERROR, "In func <%s> " "Contract not more valid\n", __func__);
+                continue;
+            }
             memcpy(&goodContract,  (ptr->contractsCache) + i, sizeof(goodContract)); // copy to goodContract
             ret_val = &goodContract; // return pointer to it
             break;
@@ -193,67 +221,19 @@ UID_ClientProfile *UID_matchProvider(char *name)
     return ret_val;
 }
 
-typedef struct {
-    size_t buffer_size;
-    char  *buffer;
-} send_tx_context;
-
 /**
- * callback from curl_easy_perform
- * returns the answer for the send from insight-api
- */
-static size_t send_tx(void *buffer, size_t size, size_t nmemb, send_tx_context *ctx)
-{
-    size_t l = size*nmemb;
-
-    if (l < ctx->buffer_size) {
-        memcpy(ctx->buffer, buffer, l);
-        ctx->buffer += l;
-        *ctx->buffer = 0;
-        ctx->buffer_size -= l;
-        return l;
-    }
-    else {
-        return -1;
-    }
-}
-
-/**
- * Sends a signed transaction to the block-chain using
- * Insight API service
+ * Insert a channel in the contract DataBase
  *
- * @param[in]  signed_tx signed transaction as hex string (ascii)
- * @param[out] ret       string buffer to be filled with the
- *                       result from Insight  API. The txid if all OK, es: <br>
- *                       {"txid":"3cd0f12a587945c75edde69e8989260fb4126b6ae803cb26de751e62a47137be"}
- * @param[in]  size      size of ret buffer
+ * @param[] channel channel to be inserted
  *
- * @return     0 == no error
+ * @return          UID_CDB_OK if no error
  */
-int UID_sendTx(char *signed_tx, char *ret, size_t size)
+int UID_insertProvideChannel(UID_SecurityProfile *channel)
 {
-    CURL *curl;
-    CURLcode res;
-    send_tx_context ctx;
-    char url[256];
-
-    curl = curl_easy_init();
-    /* Define our callback to get called when there's data to be written */
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, send_tx);
-    /* Set a pointer to our struct to pass to the callback */
-    ctx.buffer_size = size;
-    ctx.buffer = ret;
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ctx);
-
-    snprintf(url, sizeof(url), UID_SENDTX);
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    /* setup post data */
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, signed_tx);
-    /* perform the request */
-    res = curl_easy_perform(curl);
-
-    /* always cleanup */
-    curl_easy_cleanup(curl);
-
-    return res;
+    (void)channel;
+    pthread_mutex_lock(&(capDBp->in_use));  // lock the resource
+    memcpy(&(capDBp->contractsCache[0]), channel, sizeof(UID_SecurityProfile));
+    capDBp->validCacheEntries = 1;
+    pthread_mutex_unlock(&(capDBp->in_use));  // unlock the resource
+    return UID_CDB_OK;
 }

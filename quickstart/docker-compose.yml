@@ -38,7 +38,7 @@ services:
       - ${IMPRINTER_CONFIG}:/config.properties
     env_file: .env
     ports:
-      - 8090:8090
+      - 9998:9998
     networks:
       default:
         ipv4_address: 172.18.0.6
@@ -46,25 +46,16 @@ services:
       - mqtt
       - registry
 
-  legatus:
-    build: ../legatus
-    image: uniquid/dev-legatus
-    ports:
-      - 3000:3000
-    networks:
-      default:
-        ipv4_address: 172.18.0.7
-
-  dashboard:
-    build: ../dashboard
-    image: uniquid/dev-dashboard
+  orchestrator:
+    build: ../orchestrator
+    image: uniquid/dev-orchestrator
     volumes:
-      - ${DASHBOARD_CONFIG}:/conf_tpl.json
+      - ${ORCHESTRATOR_CONFIG}:/config.properties
     env_file: .env
     environment:
       - LOCAL_IP=$LOCAL_IP
     ports:
-      - 8081:8081
+      - 9999:9999
     networks:
       default:
         ipv4_address: 172.18.0.8

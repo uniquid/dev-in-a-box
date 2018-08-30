@@ -170,6 +170,23 @@ void UID_getLocalIdentity(char *tprv)
 }
 
 /**
+ * Returns the tprv string from seed
+ *
+ * @param[in]  seed     32 byte buffer containing the seed (binary form)
+ * @param[out] tprv     string buffer to be filled with the tprv
+ * @param[in]  tprvsize size of the tprv buffer
+ * @return              string containin the tprv
+ */
+char *UID_tprvFromSeed(uint8_t seed[32], char *tprv, int tprvsize)
+{
+    HDNode node;
+
+    hdnode_from_seed(seed, 32, SECP256K1_NAME, &node);
+    hdnode_serialize_private(&node, 0 /*uint32_t fingerprint*/, tprv, tprvsize);
+    return tprv;
+}
+
+/**
  * Returns the xpub for imprinting
  *
  * @return xpub @ m/44'/0'
@@ -186,17 +203,19 @@ char *UID_getTpub(void)
  * @param[in]  path bip32 path of the private-key to use
  * @param[in]  hash 32 bytes long buffer holding the digest to be signed
  * @param[out] sig  pointer to a 64 bytes long buffer to be filled with the signature
+ * @param[out] pby  pointer to signature recovery byte - it can be NULL
  * @return          0 == no error
  *
  * \todo improve error handling
  */
-int UID_signAt(UID_Bip32Path *path, uint8_t hash[32], uint8_t sig[64])
+int UID_signAt(UID_Bip32Path *path, uint8_t hash[32], uint8_t sig[64], uint8_t *pby)
 {
-    uint8_t pby = 0;
+    //uint8_t pby = 0;
     HDNode node;
 
+    if(pby) *pby = 0;
     UID_deriveAt(path, &node);
-    ecdsa_sign_digest(&secp256k1, node.private_key, hash, sig, &pby);
+    ecdsa_sign_digest(&secp256k1, node.private_key, hash, sig, pby);
     return 0;
 }
 

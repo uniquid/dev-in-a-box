@@ -25,6 +25,7 @@
 #include "ecdsa.h"
 #include "secp256k1.h"
 #include "base58.h"
+#include "base64.h"
 #include "UID_utils.h"
 
 /**
@@ -138,7 +139,46 @@ uint32_t ser_length(uint32_t len, uint8_t *out)
 }
 
 /**
- * Compute the signature of a bitcoin message
+ * Compute the bitcoin message signature \@specific BIP32 path
+ *
+ * @param[in]  message      string holding the message to be signed
+ * @param[in]  path         BIP32 path
+ * @param[out] b64signature buffer to be filled with the signature (base64 coded NULL terminated string)
+ * @param[in]  ssize        size of the b64signature buffer
+ *
+ * @return                  UID_SIGN_OK if no error
+ */
+int UID_signMessage(char *message, UID_Bip32Path *path, char *b64signature, size_t ssize)
+{
+    SHA256_CTX ctx;
+	size_t message_len;
+	uint8_t signature[65] = {0};
+
+	message_len = strlen(message);
+	sha256_Init(&ctx);
+	sha256_Update(&ctx, (const uint8_t *)"\x18" "Bitcoin Signed Message:" "\n", 25);
+	uint8_t varint[5];
+	uint32_t l = ser_length(message_len, varint);
+	sha256_Update(&ctx, varint, l);
+	sha256_Update(&ctx, (const uint8_t *)message, message_len);
+	uint8_t hash[32];
+	sha256_Final(&ctx, hash);
+	sha256_Raw(hash, 32, hash);
+	uint8_t pby;
+	//int result = ecdsa_sign_digest(&secp256k1, privkey, hash, signature + 1, &pby);
+	int result = UID_signAt(path, hash, signature + 1, &pby);
+	if (result != UID_SIGN_OK) return UID_SIGN_FAILED;
+	signature[0] = 27 + pby + 4;
+
+	size_t olen = 0;
+	int ret;
+	ret = mbedtls_base64_encode((unsigned char *)b64signature, ssize, &olen, signature, sizeof(signature));
+	if (0 == ret) return UID_SIGN_OK;
+	return UID_SIGN_SMALL_BUFFER;
+}
+
+/**
+ * Compute the bitcoin message signature
  *
  * @param[in]  message     buffer holding the message to be signed
  * @param[in]  message_len lenght of the message
@@ -165,6 +205,28 @@ int cryptoMessageSign(const uint8_t *message, size_t message_len, const uint8_t 
 		signature[0] = 27 + pby + 4;
 	}
 	return result;
+}
+
+/**
+ * Verify the signature of a bitcoin message
+ *
+ * @param[in] message      string containing the message
+ * @param[in] b64signature signature base64 coded
+ * @param[in] address      bitcoin address
+ *
+ * @return                 UID_SIGN_OK == signature match
+ */
+int UID_verifyMessage(char *message, char *b64signature, char *address)
+{
+	uint8_t signature_bin[65] = {0};
+	size_t size = 0;
+	int ret;
+
+	ret = mbedtls_base64_decode(signature_bin, sizeof(signature_bin), &size, (unsigned char *)b64signature, strlen(b64signature));
+	if(MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL == ret) return UID_SIGN_SMALL_BUFFER;
+	if(0 != ret) return UID_SIGN_INVALID_CHARACTER;
+	ret = cryptoMessageVerify((uint8_t *)message, strlen(message), address, signature_bin);
+	return (0 == ret ? UID_SIGN_OK : UID_SIGN_VERIFY_ERROR);
 }
 
 /**

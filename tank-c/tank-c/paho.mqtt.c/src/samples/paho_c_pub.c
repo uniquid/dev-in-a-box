@@ -1,29 +1,29 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 IBM Corp.
+ * Copyright (c) 2012, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *   http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
  *    Ian Craggs - initial contribution
  *    Guilherme Maciel Ferreira - add keep alive option
  *******************************************************************************/
- 
+
  /*
  stdin publisher
- 
+
  compulsory parameters:
- 
+
   --topic topic to publish on
- 
+
  defaulted parameters:
- 
+
 	--host localhost
 	--port 1883
 	--qos 0
@@ -31,27 +31,31 @@
 	--clientid stdin-publisher-async
 	--maxdatalen 100
 	--keepalive 10
-	
+
 	--userid none
 	--password none
- 
+
 */
 
 #include "MQTTAsync.h"
 
 #include <stdio.h>
 #include <signal.h>
-#include <memory.h>
-
+#include <string.h>
+#include <stdlib.h>
 
 #if defined(WIN32)
-#include <Windows.h>
+#include <windows.h>
 #define sleep Sleep
 #else
+#include <unistd.h>
 #include <sys/time.h>
-#include <stdlib.h>
+#include <unistd.h>
 #endif
 
+#if defined(_WRS_KERNEL)
+#include <OsWrapper.h>
+#endif
 
 volatile int toStop = 0;
 
@@ -123,7 +127,7 @@ void myconnect(MQTTAsync* client);
 void onConnectFailure(void* context, MQTTAsync_failureData* response)
 {
 	printf("Connect failed, rc %d\n", response ? response->code : -1);
-	connected = -1; 
+	connected = -1;
 
 	MQTTAsync client = (MQTTAsync)context;
 	myconnect(client);
@@ -132,9 +136,6 @@ void onConnectFailure(void* context, MQTTAsync_failureData* response)
 
 void onConnect(void* context, MQTTAsync_successData* response)
 {
-	MQTTAsync client = (MQTTAsync)context;
-	int rc;
-	
 	printf("Connected\n");
 	connected = 1;
 }
@@ -154,7 +155,7 @@ void myconnect(MQTTAsync* client)
 	conn_opts.onFailure = onConnectFailure;
 	conn_opts.context = client;
 	ssl_opts.enableServerCertAuth = 0;
-	conn_opts.ssl = &ssl_opts;
+	//conn_opts.ssl = &ssl_opts; need to link with SSL library for this to work
 	conn_opts.automaticReconnect = 1;
 	connected = 0;
 	if ((rc = MQTTAsync_connect(*client, &conn_opts)) != MQTTASYNC_SUCCESS)
@@ -170,14 +171,12 @@ static int published = 0;
 void onPublishFailure(void* context, MQTTAsync_failureData* response)
 {
 	printf("Publish failed, rc %d\n", response ? -1 : response->code);
-	published = -1; 
+	published = -1;
 }
 
 
 void onPublish(void* context, MQTTAsync_successData* response)
 {
-	MQTTAsync client = (MQTTAsync)context;
-
 	published = 1;
 }
 
@@ -198,7 +197,7 @@ void connectionLost(void* context, char* cause)
 	conn_opts.onFailure = onConnectFailure;
 	conn_opts.context = client;
 	ssl_opts.enableServerCertAuth = 0;
-	conn_opts.ssl = &ssl_opts;
+	//conn_opts.ssl = &ssl_opts; need to link with SSL library for this to work
 	connected = 0;
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
@@ -221,13 +220,13 @@ int main(int argc, char** argv)
 
 	if (argc < 2)
 		usage();
-	
+
 	getopts(argc, argv);
-	
+
 	sprintf(url, "%s:%s", opts.host, opts.port);
 	if (opts.verbose)
 		printf("URL is %s\n", url);
-	
+
 	topic = argv[1];
 	printf("Using topic %s\n", topic);
 
@@ -242,24 +241,24 @@ int main(int argc, char** argv)
 	myconnect(&client);
 
 	buffer = malloc(opts.maxdatalen);
-	
+
 	while (!toStop)
 	{
 		int data_len = 0;
 		int delim_len = 0;
-		
-		delim_len = strlen(opts.delimiter);
+
+		delim_len = (int)strlen(opts.delimiter);
 		do
 		{
 			buffer[data_len++] = getchar();
 			if (data_len > delim_len)
 			{
-			//printf("comparing %s %s\n", opts.delimiter, &buffer[data_len - delim_len]);
+			/* printf("comparing %s %s\n", opts.delimiter, &buffer[data_len - delim_len]); */
 			if (strncmp(opts.delimiter, &buffer[data_len - delim_len], delim_len) == 0)
 				break;
 			}
 		} while (data_len < opts.maxdatalen);
-				
+
 		if (opts.verbose)
 				printf("Publishing data of length %d\n", data_len);
 		pub_opts.onSuccess = onPublish;
@@ -270,9 +269,9 @@ int main(int argc, char** argv)
 		}
 		while (rc != MQTTASYNC_SUCCESS);
 	}
-	
+
 	printf("Stopping\n");
-	
+
 	free(buffer);
 
 	disc_opts.onSuccess = onDisconnect;
@@ -297,7 +296,7 @@ int main(int argc, char** argv)
 void getopts(int argc, char** argv)
 {
 	int count = 2;
-	
+
 	while (count < argc)
 	{
 		if (strcmp(argv[count], "--retained") == 0)
@@ -378,6 +377,5 @@ void getopts(int argc, char** argv)
 		}
 		count++;
 	}
-	
-}
 
+}

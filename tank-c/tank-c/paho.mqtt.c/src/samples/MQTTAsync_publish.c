@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 IBM Corp.
+ * Copyright (c) 2012, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,9 +14,9 @@
  *    Ian Craggs - initial contribution
  *******************************************************************************/
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "MQTTAsync.h"
 
 #if !defined(WIN32)
@@ -25,7 +25,11 @@
 #include <windows.h>
 #endif
 
-#define ADDRESS     "tcp://m2m.eclipse.org:1883"
+#if defined(_WRS_KERNEL)
+#include <OsWrapper.h>
+#endif
+
+#define ADDRESS     "tcp://iot.eclipse.org:1883"
 #define CLIENTID    "ExampleClientPub"
 #define TOPIC       "MQTT Examples"
 #define PAYLOAD     "Hello World!"
@@ -119,8 +123,6 @@ int main(int argc, char* argv[])
 {
 	MQTTAsync client;
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
-	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
-	MQTTAsync_token token;
 	int rc;
 
 	MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);

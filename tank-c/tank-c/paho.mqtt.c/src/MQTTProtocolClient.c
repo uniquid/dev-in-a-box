@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corp.
+ * Copyright (c) 2009, 2018 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution. 
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * The Eclipse Public License is available at 
+ * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at 
+ * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
@@ -17,6 +17,7 @@
  *    Ian Craggs - fix for bug 421103 - trying to write to same socket, in retry
  *    Rong Xiang, Ian Craggs - C++ compatibility
  *    Ian Craggs - turn off DUP flag for PUBREL - MQTT 3.1.1
+ *    Ian Craggs - ensure that acks are not sent if write is outstanding on socket
  *******************************************************************************/
 
 /**
@@ -28,6 +29,7 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "MQTTProtocolClient.h"
 #if !defined(NO_PERSISTENCE)
@@ -41,11 +43,17 @@
 #define min(A,B) ( (A) < (B) ? (A):(B))
 #endif
 
-void Protocol_processPublication(Publish* publish, Clients* client);
-void MQTTProtocol_closeSession(Clients* client, int sendwill);
-
 extern MQTTProtocol state;
 extern ClientStates* bstate;
+
+
+static void MQTTProtocol_storeQoS0(Clients* pubclient, Publish* publish);
+static int MQTTProtocol_startPublishCommon(
+		Clients* pubclient,
+		Publish* publish,
+		int qos,
+		int retained);
+static void MQTTProtocol_retries(time_t now, Clients* client, int regardless);
 
 /**
  * List callback function for comparing Message structures by message id
@@ -76,7 +84,7 @@ int MQTTProtocol_assignMsgId(Clients* client)
 	while (ListFindItem(client->outboundMsgs, &msgid, messageIDCompare) != NULL)
 	{
 		msgid = (msgid == MAX_MSG_ID) ? 1 : msgid + 1;
-		if (msgid == start_msgid) 
+		if (msgid == start_msgid)
 		{ /* we've tried them all - none free */
 			msgid = 0;
 			break;
@@ -89,7 +97,7 @@ int MQTTProtocol_assignMsgId(Clients* client)
 }
 
 
-void MQTTProtocol_storeQoS0(Clients* pubclient, Publish* publish)
+static void MQTTProtocol_storeQoS0(Clients* pubclient, Publish* publish)
 {
 	int len;
 	pending_write* pw = NULL;
@@ -117,7 +125,7 @@ void MQTTProtocol_storeQoS0(Clients* pubclient, Publish* publish)
  * @param retained boolean - whether to set the MQTT retained flag
  * @return the completion code
  */
-int MQTTProtocol_startPublishCommon(Clients* pubclient, Publish* publish, int qos, int retained)
+static int MQTTProtocol_startPublishCommon(Clients* pubclient, Publish* publish, int qos, int retained)
 {
 	int rc = TCPSOCKET_COMPLETE;
 
@@ -268,12 +276,14 @@ int MQTTProtocol_handlePublishes(void* pack, int sock)
 
 	if (publish->header.bits.qos == 0)
 		Protocol_processPublication(publish, client);
+	else if (!Socket_noPendingWrites(sock))
+		rc = SOCKET_ERROR; /* queue acks? */
 	else if (publish->header.bits.qos == 1)
 	{
-		/* send puback before processing the publications because a lot of return publications could fill up the socket buffer */
-		rc = MQTTPacket_send_puback(publish->msgId, &client->net, client->clientID);
-		/* if we get a socket error from sending the puback, should we ignore the publication? */
-		Protocol_processPublication(publish, client);
+	  /* send puback before processing the publications because a lot of return publications could fill up the socket buffer */
+	  rc = MQTTPacket_send_puback(publish->msgId, &client->net, client->clientID);
+	  /* if we get a socket error from sending the puback, should we ignore the publication? */
+	  Protocol_processPublication(publish, client);
 	}
 	else if (publish->header.bits.qos == 2)
 	{
@@ -413,6 +423,8 @@ int MQTTProtocol_handlePubrels(void* pack, int sock)
 	{
 		if (pubrel->header.bits.dup == 0)
 			Log(TRACE_MIN, 3, NULL, "PUBREL", client->clientID, pubrel->msgId);
+		else if (!Socket_noPendingWrites(sock))
+			rc = SOCKET_ERROR; /* queue acks? */
 		else
 			/* Apparently this is "normal" behaviour, so we don't need to issue a warning */
 			rc = MQTTPacket_send_pubcomp(pubrel->msgId, &client->net, client->clientID);
@@ -424,6 +436,8 @@ int MQTTProtocol_handlePubrels(void* pack, int sock)
 			Log(TRACE_MIN, 4, NULL, "PUBREL", client->clientID, pubrel->msgId, m->qos);
 		else if (m->nextMessageType != PUBREL)
 			Log(TRACE_MIN, 5, NULL, "PUBREL", client->clientID, pubrel->msgId);
+		else if (!Socket_noPendingWrites(sock))
+		  rc = SOCKET_ERROR; /* queue acks? */
 		else
 		{
 			Publish publish;
@@ -514,7 +528,7 @@ void MQTTProtocol_keepalive(time_t now)
 	while (current)
 	{
 		Clients* client =	(Clients*)(current->content);
-		ListNextElement(bstate->clients, &current); 
+		ListNextElement(bstate->clients, &current);
 		if (client->connected && client->keepAliveInterval > 0 &&
 			(difftime(now, client->net.lastSent) >= client->keepAliveInterval ||
 					difftime(now, client->net.lastReceived) >= client->keepAliveInterval))
@@ -552,7 +566,7 @@ void MQTTProtocol_keepalive(time_t now)
  * @param client - the client to which to apply the retry processing
  * @param regardless boolean - retry packets regardless of retry interval (used on reconnect)
  */
-void MQTTProtocol_retries(time_t now, Clients* client, int regardless)
+static void MQTTProtocol_retries(time_t now, Clients* client, int regardless)
 {
 	ListElement* outcurrent = NULL;
 
@@ -661,12 +675,18 @@ void MQTTProtocol_freeClient(Clients* client)
 	MQTTProtocol_freeMessageList(client->inboundMsgs);
 	ListFree(client->messageQueue);
 	free(client->clientID);
+        client->clientID = NULL;
 	if (client->will)
 	{
-		free(client->will->msg);
+		free(client->will->payload);
 		free(client->will->topic);
 		free(client->will);
+                client->will = NULL;
 	}
+	if (client->username)
+		free((void*)client->username);
+	if (client->password)
+		free((void*)client->password);
 #if defined(OPENSSL)
 	if (client->sslopts)
 	{
@@ -680,7 +700,13 @@ void MQTTProtocol_freeClient(Clients* client)
 			free((void*)client->sslopts->privateKeyPassword);
 		if (client->sslopts->enabledCipherSuites)
 			free((void*)client->sslopts->enabledCipherSuites);
+		if (client->sslopts->struct_version >= 2)
+		{
+			if (client->sslopts->CApath)
+				free((void*)client->sslopts->CApath);
+		}
 		free(client->sslopts);
+                client->sslopts = NULL;
 	}
 #endif
 	/* don't free the client structure itself... this is done elsewhere */
@@ -733,7 +759,7 @@ char* MQTTStrncpy(char *dest, const char *src, size_t dest_size)
   size_t count = dest_size;
   char *temp = dest;
 
-  FUNC_ENTRY; 
+  FUNC_ENTRY;
   if (dest_size < strlen(src))
     Log(TRACE_MIN, -1, "the src string is truncated");
 
